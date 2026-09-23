@@ -1,0 +1,103 @@
+import type { GetServerSideProps } from 'next'
+import type { ParsedUrlQuery } from 'querystring'
+import { z } from 'zod'
+
+import client from '@/apollo/apollo-client'
+import { fetchWeeklys } from '@/apollo/query/magazines'
+import Layout from '@/components/shared/layout'
+import MagazineViewer from '@/modules/magazine/components/magazine-viewer'
+import type { WeeklyMagazine } from '@/modules/magazine/magazine-types'
+import { getLogTraceObject } from '@/utils'
+import type { ShellHeaderData } from '@/utils/api'
+import { fetchShellHeaderData } from '@/utils/api'
+import { setPageCache } from '@/utils/cache-setting'
+import { processSettledResult } from '@/utils/response-processor'
+import redirectToLoginWhileUnauthed from '@/utils/server-side-only/redirect-to-login-while-unauthed'
+
+const magazineRouteParamsSchema = z.object({
+  book: z.string().min(1),
+  issue: z.string().min(1),
+})
+
+type MagazineRouteParams = ParsedUrlQuery & {
+  book: string
+  issue: string
+}
+
+type MagazineViewerPageProps = Record<string, unknown> & {
+  book: string
+  headerData: ShellHeaderData
+  issue: string
+  weeklys: WeeklyMagazine[]
+}
+
+export default function MagazineViewerPage({
+  book,
+  headerData,
+  issue,
+  weeklys,
+}: MagazineViewerPageProps) {
+  return (
+    <Layout
+      head={{ title: `動態雜誌 ${issue.split('-')[0]}` }}
+      header={{ type: 'default', data: headerData }}
+      withFooter={false}
+    >
+      <MagazineViewer book={book} issue={issue} weeklys={weeklys} />
+    </Layout>
+  )
+}
+
+export const getServerSideProps: GetServerSideProps<
+  MagazineViewerPageProps,
+  MagazineRouteParams
+> = redirectToLoginWhileUnauthed()<
+  MagazineViewerPageProps,
+  MagazineRouteParams
+>(async ({ params, req, res }) => {
+  setPageCache(res, { cachePolicy: 'no-store' }, req.url)
+
+  const routeParams = magazineRouteParamsSchema.safeParse(params)
+
+  if (!routeParams.success) {
+    return { notFound: true }
+  }
+
+  const { book, issue } = routeParams.data
+  const globalLogFields: Record<string, unknown> = {
+    ...getLogTraceObject(req),
+  }
+  const responses = await Promise.allSettled([
+    fetchShellHeaderData({ logFields: globalLogFields }),
+    client.query({ query: fetchWeeklys }),
+  ])
+
+  const headerData = processSettledResult(
+    responses[0],
+    (data): ShellHeaderData =>
+      data ?? {
+        flashNewsData: [],
+        navigationData: [],
+        sectionPostsData: {},
+        topicsData: [],
+      },
+    `Error occurs while getting shell header data in magazine page (issue: ${issue})`,
+    globalLogFields
+  )
+
+  const weeklys = processSettledResult(
+    responses[1],
+    (result): WeeklyMagazine[] => result?.data.magazines ?? [],
+    `Error occurs while getting data in magazine page (issue: ${issue})`,
+    globalLogFields
+  )
+
+  return {
+    props: {
+      book,
+      headerData,
+      issue,
+      weeklys,
+    },
+  }
+})
