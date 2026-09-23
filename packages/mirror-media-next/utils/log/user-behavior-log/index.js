@@ -14,7 +14,7 @@ import {
 /**
  * @typedef {'pageview' | 'exit' | 'scroll-to-80%' | 'click'} EventType
  *
- * @typedef {import('../../../context/membership').MemberType} MemberType
+ * @typedef {import('../../../modules/membership/membership-types').MemberType} MemberType
  *
  * @typedef {Object} Payload
  * @property {MemberType} memberType - type of member

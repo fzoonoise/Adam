@@ -11,7 +11,7 @@
 import { useEffect, useState } from 'react'
 
 import { MISO_API_KEY } from '../config/index.mjs'
-import { useMembership } from '../context/membership'
+import { useMembership } from '../modules/membership/membership-context'
 
 import MisoScript from './miso-script'
 

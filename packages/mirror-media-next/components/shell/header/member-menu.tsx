@@ -14,9 +14,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Link } from '@/components/ui/link'
-import { logout, useMembership } from '@/context/membership'
 import { useAppDispatch } from '@/hooks/useRedux'
-import { loginActions } from '@/slice/login-slice'
+import { loginActions } from '@/modules/authentication/authentication-state'
+import { logout, useMembership } from '@/modules/membership/membership-context'
 import { getLoginHref } from '@/utils'
 
 function MemberMenu() {

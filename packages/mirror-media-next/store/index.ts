@@ -1,6 +1,6 @@
 import { type Action, configureStore, type ThunkAction } from '@reduxjs/toolkit'
 
-import loginReducer from '../slice/login-slice'
+import loginReducer from '../modules/authentication/authentication-state'
 
 const makeStore = () => configureStore({ reducer: { login: loginReducer } })
 const store = makeStore()

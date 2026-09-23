@@ -32,11 +32,11 @@ const formatErrorMessage = (error) => {
 
 /**
  *
- * @typedef {import('../../../context/membership').MemberType} MemberType
+ * @typedef {import('../../../modules/membership/membership-types').MemberType} MemberType
  *
  * @typedef {Object} Payload
  * @property {MemberType} [memberType] - type of member
- * @property {string} [userEmail] - member email
+ * @property {string | null} [userEmail] - member email
  * @property {string} [firebaseId] - member firebase id
  * @property {boolean} [isMemberArticle] - whether is member article. It will only be `true` if it is on story page and is a member article.
  */

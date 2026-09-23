@@ -5,8 +5,8 @@ import axios from 'axios'
 import styled from 'styled-components'
 
 import { ENV } from '../../config/index.mjs'
-import { useMembership } from '../../context/membership'
 import useWindowDimensions from '../../hooks/use-window-dimensions'
+import { useMembership } from '../../modules/membership/membership-context'
 
 import Reels from './reels'
 

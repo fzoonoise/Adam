@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
 import debounce from 'debounce'
 
-import { useMembership } from '../../context/membership'
+import { useMembership } from '../../modules/membership/membership-context'
 import { sendUserBehaviorLog } from '../../utils/log/send-log'
 import { generateUserBehaviorLogInfo } from '../../utils/log/user-behavior-log'
 /**

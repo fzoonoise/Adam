@@ -1,46 +1,24 @@
+import type { Dispatch, ReactElement, ReactNode } from 'react'
 import { createContext, useContext, useEffect, useReducer } from 'react'
+import type { User } from 'firebase/auth'
 
-import { generateErrorReportInfo } from '../utils/log/error-log'
-import { sendErrorLog } from '../utils/log/send-log'
+import { generateErrorReportInfo } from '@/utils/log/error-log'
+import { sendErrorLog } from '@/utils/log/send-log'
+
 import {
   getAccessToken,
   removeAccessTokenFromStorage,
-} from '../utils/membership'
-
-/**
- * @typedef {Object} MemberInfo
- * @property {MemberType} memberType
- */
-
-/**
- * @typedef {Object} Membership
- * @property {boolean} isLoggedIn
- * @property {string} accessToken
- * @property {string} userEmail
- * @property {string} firebaseId
- * @property {MemberInfo} memberInfo
- * @property {boolean} isLogInProcessFinished
- */
-
-/**
- * @typedef {Object} MembershipReducerAction
- * @property {"LOGIN" | "LOGOUT"} type
- * @property {Object} [payload]
- * @property {Membership["accessToken"]} [payload.accessToken]
- * @property {MemberInfo} [payload.memberInfo]
- * @property {string} [payload.userEmail]
- * @property {string} [payload.firebaseId]
- */
-
-/**
- * @typedef { 'not-member' |'basic-member' | 'premium-member' | 'one-time-member' | 'one-time-member'} MemberType
- */
+} from './membership-token'
+import type {
+  Membership,
+  MembershipReducerAction,
+  MemberType,
+} from './membership-types'
 
 /**
  * TODO: check which data should be stored, such as user email, is email verified, etc.
- * @type {Membership}
  */
-const initialMembership = {
+const initialMembership: Membership = {
   isLoggedIn: false,
   accessToken: '',
   userEmail: '',
@@ -49,22 +27,15 @@ const initialMembership = {
   firebaseId: '',
 }
 
-/**
- * @typedef {import('react').Dispatch<MembershipReducerAction>} MembershipDispatch
- */
-
 const MembershipContext = createContext(initialMembership)
 
-/** @type {import('react').Context<MembershipDispatch>} */
-const MembershipDispatchContext = createContext(null)
+const MembershipDispatchContext =
+  createContext<Dispatch<MembershipReducerAction> | null>(null)
 
-/**
- *
- * @param {Membership} membership
- * @param {MembershipReducerAction} action
- * @returns {Membership}
- */
-const membershipReducer = (membership, action) => {
+const membershipReducer = (
+  membership: Membership,
+  action: MembershipReducerAction
+): Membership => {
   const { memberInfo } = membership
   const isLogInProcessFinished = true
   switch (action.type) {
@@ -120,12 +91,12 @@ const membershipReducer = (membership, action) => {
  * 2. Sign-in/sign-out to firebase is only part of the login/logout process:
  *    - After firebase sign-in, it is needed get Access token, and dispatch a "LOGIN" action to store access token.
  *    - After firebase sign-out, it is needed to dispatch a "LOGOUT" action to clear access token.
- *
- * @param {Object} props
- * @param {import('react').JSX.Element} props.children
- * @returns {import('react').JSX.Element}
  */
-const MembershipProvider = ({ children }) => {
+const MembershipProvider = ({
+  children,
+}: {
+  children: ReactNode
+}): ReactElement => {
   const [membership, dispatch] = useReducer(
     membershipReducer,
     initialMembership
@@ -140,16 +111,13 @@ const MembershipProvider = ({ children }) => {
      * Return a token string if success, return null if failed.
      * If return `null`, which means some unexpected error occurred on Firebase.
      * @see https://firebase.google.com/docs/reference/js/auth.user.md#usergetidtoken
-     *
-     * @param {import('firebase/auth').User} user
-     * @returns {Promise<import('firebase/auth').IdTokenResult["token"]| null>}
      */
-    const getIdToken = async (user) => {
+    const getIdToken = async (user: User): Promise<string | null> => {
       try {
         const idToken = await user.getIdToken()
         return idToken
       } catch (err) {
-        const errorLog = generateErrorReportInfo(err, {
+        const errorLog = generateErrorReportInfo(err as Error, {
           userEmail: membership.userEmail,
           firebaseId: membership.firebaseId,
         })
@@ -159,11 +127,7 @@ const MembershipProvider = ({ children }) => {
       }
     }
 
-    /**
-     * @param {string} accessToken
-     * @returns {MemberType}
-     */
-    const getMemberType = (accessToken) => {
+    const getMemberType = (accessToken: string): MemberType => {
       try {
         const JwtPayload = accessToken.split('.')[1]
 
@@ -171,9 +135,9 @@ const MembershipProvider = ({ children }) => {
         const decodedString = buffer.toString('utf-8')
         const decodedJwtPayload = JSON.parse(decodedString)
         const memberType = decodedJwtPayload.roles[0]
-        return memberType
+        return memberType as MemberType
       } catch (e) {
-        const errorLog = generateErrorReportInfo(e, {
+        const errorLog = generateErrorReportInfo(e as Error, {
           userEmail: membership.userEmail,
           firebaseId: membership.firebaseId,
         })
@@ -183,13 +147,9 @@ const MembershipProvider = ({ children }) => {
       }
     }
 
-    /**
-     * @typedef {import('firebase/auth').Auth} Auth
-     * @type {Parameters<Auth['onAuthStateChanged']>[0]}
-     */
-    const handleFirebaseAuthStateChanged = async (user) => {
+    const handleFirebaseAuthStateChanged = async (user: User | null) => {
       const [{ auth }, { signOut }] = await Promise.all([
-        import('../firebase'),
+        import('@/firebase'),
         import('firebase/auth'),
       ])
 
@@ -230,7 +190,9 @@ const MembershipProvider = ({ children }) => {
            * 1. Firebase id Token is verified by WAS, but it is an invalid id token. The status code is 401.
            * 2. WAS has some unexpected error, such as unable to sign in JWT token, or unable to request GQL server. The status code is 500.
            */
-          const statusCode = error?.response?.status
+          const statusCode = (
+            error as { response?: { status?: number } } | null
+          )?.response?.status
           switch (statusCode) {
             case 401:
               //Logout firebase
@@ -238,7 +200,7 @@ const MembershipProvider = ({ children }) => {
               break
             case 500:
             default: {
-              const errorLog = generateErrorReportInfo(error, {
+              const errorLog = generateErrorReportInfo(error as Error, {
                 userEmail: user.email,
                 firebaseId: user.uid,
               })
@@ -256,8 +218,8 @@ const MembershipProvider = ({ children }) => {
       }
     }
 
-    const setupAuthStateChanged = async () => {
-      const { auth } = await import('../firebase')
+    const setupAuthStateChanged = async (): Promise<void> => {
+      const { auth } = await import('@/firebase')
 
       if (!isMounted) {
         return
@@ -286,20 +248,20 @@ const MembershipProvider = ({ children }) => {
 /**
  * This context provide the value of property in membership, such as `isLoggedIn`, `accessToken`.
  */
-const useMembership = () => {
+const useMembership = (): Membership => {
   return useContext(MembershipContext)
 }
 
 /**
  * This context provide the function that lets components dispatch actions to set value of property in membership.
  */
-const useMembershipDispatch = () => {
+const useMembershipDispatch = (): Dispatch<MembershipReducerAction> | null => {
   return useContext(MembershipDispatchContext)
 }
 
-const handleFirebaseSignOut = async () => {
+const handleFirebaseSignOut = async (): Promise<void> => {
   const [{ auth }, { signOut }] = await Promise.all([
-    import('../firebase'),
+    import('@/firebase'),
     import('firebase/auth'),
   ])
   const currentUser = auth.currentUser
@@ -307,7 +269,7 @@ const handleFirebaseSignOut = async () => {
   try {
     await signOut(auth)
   } catch (error) {
-    const errorLog = generateErrorReportInfo(error, {
+    const errorLog = generateErrorReportInfo(error as Error, {
       userEmail: currentUser?.email,
       firebaseId: currentUser?.uid,
     })

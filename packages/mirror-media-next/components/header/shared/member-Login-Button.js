@@ -4,10 +4,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import styled from 'styled-components'
 
-import { logout, useMembership } from '../../../context/membership'
 import useClickOutside from '../../../hooks/useClickOutside'
 import { useAppDispatch } from '../../../hooks/useRedux'
-import { loginActions } from '../../../slice/login-slice'
+import { loginActions } from '../../../modules/authentication/authentication-state'
+import {
+  logout,
+  useMembership,
+} from '../../../modules/membership/membership-context'
 import { getLoginHref } from '../../../utils'
 
 const MemberLoginButtonWrapper = styled.div`

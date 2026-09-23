@@ -1,10 +1,10 @@
 import { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
 
-import { useMembership } from '../context/membership'
-import { getLoginHref } from '../utils'
+import { getLoginHref } from '@/utils'
 
-type MemberInfo = import('../context/membership').MemberInfo
+import { useMembership } from './membership-context'
+import type { MemberInfo } from './membership-types'
 
 type MembershipValidator = (memberInfo: MemberInfo | undefined) => boolean
 

@@ -1,4 +1,4 @@
-import { useMembership } from '../context/membership'
+import { useMembership } from '../modules/membership/membership-context'
 
 /**
  * hiddenAdvertised: `Posts` 的「google廣告違規」欄位是否有被勾選（如有勾選則不顯示所有廣告）
