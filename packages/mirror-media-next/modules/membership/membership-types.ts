@@ -1,8 +1,9 @@
-type MemberType =
-  | 'not-member'
-  | 'basic-member'
-  | 'premium-member'
-  | 'one-time-member'
+/**
+ * Role identifier issued by WAS.
+ * Known values include `not-member`, `basic-member`, `premium-member`, and
+ * `one-time-member`; the contract stays open for premium and staff variants.
+ */
+type MemberType = string
 
 type MemberInfo = { memberType: MemberType }
 

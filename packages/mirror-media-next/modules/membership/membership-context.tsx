@@ -7,6 +7,7 @@ import { sendErrorLog } from '@/utils/log/send-log'
 
 import {
   getAccessToken,
+  getMemberTypeFromAccessToken,
   removeAccessTokenFromStorage,
 } from './membership-token'
 import type {
@@ -129,13 +130,7 @@ const MembershipProvider = ({
 
     const getMemberType = (accessToken: string): MemberType => {
       try {
-        const JwtPayload = accessToken.split('.')[1]
-
-        const buffer = Buffer.from(JwtPayload, 'base64')
-        const decodedString = buffer.toString('utf-8')
-        const decodedJwtPayload = JSON.parse(decodedString)
-        const memberType = decodedJwtPayload.roles[0]
-        return memberType as MemberType
+        return getMemberTypeFromAccessToken(accessToken)
       } catch (e) {
         const errorLog = generateErrorReportInfo(e as Error, {
           userEmail: membership.userEmail,

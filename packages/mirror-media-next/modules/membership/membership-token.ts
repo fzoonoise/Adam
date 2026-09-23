@@ -1,14 +1,39 @@
 import axios from 'axios'
+import { z } from 'zod'
 
 import { API_TIMEOUT, WEEKLY_API_SERVER_ORIGIN } from '@/config/index.mjs'
+import { monitorZodSafeParse } from '@/utils/zod-monitor'
 
-type AccessTokenData = {
-  access_token: string
-  token_type: string
-  expires_in: number
-}
+import type { MemberType } from './membership-types'
+
+const accessTokenResponseSchema = z
+  .object({
+    data: z
+      .object({
+        access_token: z.string(),
+      })
+      .passthrough(),
+  })
+  .passthrough()
+
+const accessTokenPayloadSchema = z
+  .object({
+    roles: z.tuple([z.string()]).rest(z.unknown()),
+  })
+  .passthrough()
 
 const ACCESS_TOKEN_STORE_KEY = 'access-token'
+
+type LegacyAccessTokenResponse = {
+  data: {
+    access_token: string
+    [key: string]: unknown
+  }
+}
+
+type LegacyAccessTokenPayload = {
+  roles: MemberType[]
+}
 
 const removeAccessTokenFromStorage = (): void => {
   localStorage.removeItem(ACCESS_TOKEN_STORE_KEY)
@@ -16,7 +41,7 @@ const removeAccessTokenFromStorage = (): void => {
 
 const getAccessToken = async (idToken: string): Promise<string> => {
   try {
-    const response = await axios({
+    const response = await axios<unknown>({
       method: 'post',
       url: `https://${WEEKLY_API_SERVER_ORIGIN}/access-token`,
       headers: {
@@ -25,17 +50,28 @@ const getAccessToken = async (idToken: string): Promise<string> => {
       timeout: API_TIMEOUT,
     })
 
-    const accessTokenData = response.data.data as AccessTokenData | undefined
+    const validationResult = monitorZodSafeParse(
+      accessTokenResponseSchema,
+      response.data,
+      {
+        boundary: 'was:access-token',
+        schemaName: 'accessTokenResponseSchema',
+      }
+    )
 
-    if (accessTokenData) {
-      localStorage.setItem(
-        ACCESS_TOKEN_STORE_KEY,
-        JSON.stringify(accessTokenData)
-      )
-      return accessTokenData.access_token
+    const { data: accessTokenData } = validationResult.success
+      ? validationResult.data
+      : (response.data as LegacyAccessTokenResponse)
+
+    if (!accessTokenData) {
+      throw new Error()
     }
 
-    throw new Error()
+    localStorage.setItem(
+      ACCESS_TOKEN_STORE_KEY,
+      JSON.stringify(accessTokenData)
+    )
+    return accessTokenData.access_token
   } catch (error) {
     const statusCode = (error as { response?: { status?: number } } | null)
       ?.response?.status
@@ -58,4 +94,33 @@ const getAccessToken = async (idToken: string): Promise<string> => {
   }
 }
 
-export { getAccessToken, removeAccessTokenFromStorage }
+const getMemberTypeFromAccessToken = (accessToken: string): MemberType => {
+  const jwtPayload = accessToken.split('.')[1]
+
+  if (!jwtPayload) {
+    throw new Error('Access token is missing its JWT payload.')
+  }
+
+  const decodedString = Buffer.from(jwtPayload, 'base64').toString('utf-8')
+  const decodedPayload: unknown = JSON.parse(decodedString)
+  const validationResult = monitorZodSafeParse(
+    accessTokenPayloadSchema,
+    decodedPayload,
+    {
+      boundary: 'was:access-token-jwt',
+      schemaName: 'accessTokenPayloadSchema',
+    }
+  )
+
+  const { roles } = validationResult.success
+    ? validationResult.data
+    : (decodedPayload as LegacyAccessTokenPayload)
+
+  return roles[0]
+}
+
+export {
+  getAccessToken,
+  getMemberTypeFromAccessToken,
+  removeAccessTokenFromStorage,
+}
