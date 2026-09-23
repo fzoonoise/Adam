@@ -120,12 +120,15 @@ packages/mirror-media-next/
 │   ├── index.tsx                       # Homepage route composition
 │   └── podcasts/index.tsx              # Podcast route composition
 ├── modules/                            # Business capabilities, shallow by default
+│   ├── account/                        # Member profile data, types and UI
+│   ├── authentication/                 # Login, registration and password flows
 │   ├── homepage/
 │   │   ├── homepage-types.ts           # Homepage-owned view-model types
 │   │   ├── homepage-data.ts            # Server data aggregation
 │   │   ├── homepage-client-data.ts     # Browser load-more boundary
 │   │   ├── homepage-static-json.schema.ts
 │   │   └── components/                 # Homepage-owned UI
+│   ├── membership/                     # Shared auth state, token and access guard
 │   └── podcast/
 │       ├── podcast-types.ts            # Podcast-owned view-model types
 │       ├── podcast-data.ts             # Fetch, validate and normalize Podcast data
@@ -145,14 +148,12 @@ packages/mirror-media-next/
 ├── axios/                              # Existing HTTP compatibility wrapper
 ├── config/                             # Environment configuration
 ├── constants/                          # Cross-cutting constants; review touched files
-├── context/                            # Existing React context state
 ├── firebase/                           # Firebase client/admin integration boundary
 ├── hooks/                              # Proven cross-cutting browser hooks
 ├── mocks/                              # Development fixtures and mock server
 ├── public/                             # Runtime assets and generated public artifacts
 ├── scripts/                            # Package tooling
 ├── service-worker/                     # Auth-only service worker source
-├── slice/                              # Existing Redux slices
 ├── store/                              # Redux store infrastructure
 ├── styles/                             # Tailwind source/theme and legacy styling
 ├── type/                               # Legacy JSDoc/global types; no new entries
@@ -194,6 +195,18 @@ packages/mirror-media-next/
 ```
 
 Legacy bridge 不承接新的 ownership。等六個元件完成 `.tsx` 遷移、互動與無障礙驗證，並將所有 consumers 更新到 `modules/podcast/components/` 後，刪除 `components/podcast/` 舊路徑。執行時程與 owner 放在 local-only execution 文件，不寫入這份長期架構表。
+
+### Current membership ownership（目前會員能力所有權）
+
+P7 已建立三個有實際 consumers（使用端）的 capability modules（能力模組）：
+
+- `modules/membership/` 持有 Firebase auth observer（驗證觀察者）、會員 context（狀態內容）、WAS access token（存取權杖）、會員型別與登入保護 hook（掛鉤）。`pages/_app.js` 可掛載 `MembershipProvider`；shell、會員頁、廣告與紀錄元件只透過其公開 context 操作讀取狀態或登出。
+- `modules/authentication/` 持有登入、註冊、密碼重設與 Firebase email action（電子郵件動作）的表單元件、Redux UI state（使用者介面狀態）及流程工具。它可依賴 `modules/membership/membership-types.ts` 的型別契約，不接管全站會員 session（工作階段）的生命週期。
+- `modules/account/` 持有個人資料的型別、GraphQL data functions（資料函式）與表單元件；它透過 `modules/membership/membership-context.tsx` 取得呼叫會員 API 所需的公開狀態。
+
+`components/shell/header/member-menu.tsx` 可讀取 membership context，並使用 `authentication-state.ts` 將登入表單切回起始狀態；這是 shell 呈現登入／登出操作所需的公開狀態操作，不把 session 或表單生命週期移進 shell。
+
+對應的 `pages/login`、`pages/profile`、`pages/recover-password`、`pages/update-password`、`pages/email-handler` 與密碼結果頁只保留 route exports（路由匯出）、GSSP、cache／redirect policy（快取／轉導政策）及頁面組合。三個 module 均不得 import `pages/**`；shared membership module（共用會員模組）也不得反向依賴 account 或 authentication。這些邊界由 root ESLint config（根目錄 ESLint 設定）的 path-specific restrictions（路徑限制）執行。
 
 ### Ownership and placement（所有權與放置規則）
 

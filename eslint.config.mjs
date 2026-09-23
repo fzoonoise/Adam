@@ -185,5 +185,51 @@ export default [
       },
     },
   },
+  {
+    files: [
+      'packages/mirror-media-next/modules/{account,authentication,membership}/**/*.{ts,tsx}',
+    ],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/pages/**', '../../pages/**', '../../../pages/**'],
+              message:
+                'Capability modules must not import route-owned policy from pages/.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['packages/mirror-media-next/modules/membership/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/pages/**', '../../pages/**', '../../../pages/**'],
+              message:
+                'Capability modules must not import route-owned policy from pages/.',
+            },
+            {
+              group: [
+                '@/modules/account/**',
+                '@/modules/authentication/**',
+                '../account/**',
+                '../authentication/**',
+              ],
+              message:
+                'The shared membership capability must not depend on account or authentication flows.',
+            },
+          ],
+        },
+      ],
+    },
+  },
   eslintPluginPrettierRecommended,
 ]
