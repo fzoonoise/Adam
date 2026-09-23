@@ -67,6 +67,10 @@ const createMemberDataInIsrafel = async (
   email: string | null,
   firebaseId: string
 ): Promise<void> => {
+  if (!email) {
+    throw new Error('Firebase user email is required to create member data.')
+  }
+
   try {
     await client.mutate({
       mutation: createMember,
@@ -78,7 +82,7 @@ const createMemberDataInIsrafel = async (
       },
       variables: {
         firebaseId: firebaseId,
-        email: email as string,
+        email,
       },
     })
   } catch (error) {
