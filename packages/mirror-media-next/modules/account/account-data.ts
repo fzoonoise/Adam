@@ -19,7 +19,7 @@ const fetchAccountProfile = async (
     },
   })
 
-  return response?.data?.member as AccountProfile | undefined
+  return response.data.member ?? undefined
 }
 
 const updateAccountProfile = async (

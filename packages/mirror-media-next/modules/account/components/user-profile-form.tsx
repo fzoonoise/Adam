@@ -122,11 +122,7 @@ export default function UserProfileForm({
 
           idRef.current = id
           setUserName(name ?? '')
-          setUserGender(
-            gender && gender in genderMap
-              ? genderMap[gender as keyof typeof genderMap]
-              : ''
-          )
+          setUserGender(gender ? genderMap[gender] : '')
           setUserYear(formatBirthday(birthday).year)
           setUserMonth(formatBirthday(birthday).month)
           setUserDay(formatBirthday(birthday).day)
