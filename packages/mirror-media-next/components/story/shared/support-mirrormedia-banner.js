@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-import { PRIZE_LIST } from '../../../constants/subscribe-constants'
+import { PRIZE_LIST } from '../../../modules/subscription/subscription-data'
 
 import DonateLink from './donate-link'
 import SubscribeLink from './subscribe-link'

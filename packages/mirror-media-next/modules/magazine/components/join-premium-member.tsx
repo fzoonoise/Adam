@@ -2,7 +2,7 @@ import { cn } from '@/components/cn'
 import { buttonVariants } from '@/components/ui/button'
 import { Link } from '@/components/ui/link'
 import { Typography } from '@/components/ui/typography'
-import { PRIZE_LIST } from '@/constants/subscribe-constants'
+import { PRIZE_LIST } from '@/modules/subscription/subscription-data'
 
 export default function JoinPremiumMember() {
   return (
