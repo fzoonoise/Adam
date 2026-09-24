@@ -187,7 +187,7 @@ export default [
   },
   {
     files: [
-      'packages/mirror-media-next/modules/{account,authentication,magazine,membership}/**/*.{ts,tsx}',
+      'packages/mirror-media-next/modules/{account,authentication,commerce,magazine,membership,paper-magazine,subscription}/**/*.{ts,tsx}',
     ],
     rules: {
       'no-restricted-imports': [

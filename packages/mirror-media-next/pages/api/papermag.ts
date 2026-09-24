@@ -15,23 +15,11 @@ import {
   NEWEBPAY_PAPERMAG_KEY,
   SITE_URL,
 } from '../../config/index.mjs'
-import { PLAN_LIST } from '../../constants/papermag'
-
-type PapermagTradeInfoInput =
-  FetchPaymentDataOfPapermagMutationVariables['data']
-
-type TradeInfo = FetchPaymentDataOfPapermagMutationVariables & {
-  data: PapermagTradeInfoInput & {
-    Amt?: unknown
-    merchandise: {
-      connect: {
-        code: string
-      }
-    }
-    itemCount: number
-    promoteCode?: string | null
-  }
-}
+import {
+  COUPON_DISCOUNT,
+  paperMagazineOrderInputSchema,
+  PLAN_LIST,
+} from '../../modules/paper-magazine/paper-magazine-data'
 
 type NewebpayTradeInfo = NonNullable<
   FetchPaymentDataOfPapermagMutation['createNewebpayTradeInfoForMagazineOrder']
@@ -103,19 +91,18 @@ export default async function EncryptInfo(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const tradeInfo = req.body as TradeInfo
   try {
     // 防止使用者自行修改 Amt 的值
     // 詳見：https://app.asana.com/1/614399484723017/project/1210077071799813/task/1210384428427743?focus=true
-    const hasInputAmt = Object.prototype.hasOwnProperty.call(
-      tradeInfo.data,
-      'Amt'
-    )
-    const paymentInput = { ...tradeInfo.data }
-    delete paymentInput.Amt
+    const rawData = (req.body as { data?: unknown } | null)?.data
+    const hasInputAmt =
+      typeof rawData === 'object' &&
+      rawData !== null &&
+      Object.prototype.hasOwnProperty.call(rawData, 'Amt')
     if (hasInputAmt) {
       throw new Error('Amt is not correct input')
     }
+    const paymentInput = paperMagazineOrderInputSchema.parse(rawData)
 
     const variables: FetchPaymentDataOfPapermagMutationVariables = {
       data: paymentInput,
@@ -123,15 +110,15 @@ export default async function EncryptInfo(
     const data = await getPaymentDataOfMagazineOrders(variables)
     const infoForNewebpay = data.createNewebpayTradeInfoForMagazineOrder
 
-    const itemCode = tradeInfo.data.merchandise.connect.code
+    const itemCode = paymentInput.merchandise.connect.code
     const item = PLAN_LIST.find((item) => item.code === itemCode)
     if (!item) {
       throw new Error('item is not correct input')
     }
     const itemPrice = item.price
-    const itemCount = tradeInfo.data.itemCount
-    const hasPromoteCode = !!tradeInfo.data.promoteCode
-    const promoteCodeDiscount = hasPromoteCode ? 80 * itemCount : 0
+    const itemCount = paymentInput.itemCount
+    const hasPromoteCode = !!paymentInput.promoteCode
+    const promoteCodeDiscount = hasPromoteCode ? COUPON_DISCOUNT * itemCount : 0
     const totalPrice = itemPrice * itemCount - promoteCodeDiscount
     if (totalPrice !== infoForNewebpay.Amt) {
       throw new Error(
@@ -148,7 +135,7 @@ export default async function EncryptInfo(
       data: encryptPostData,
     })
   } catch (e) {
-    const error = e as Error
+    const error = e instanceof Error ? e : new Error(String(e))
     const helpers = errors.helpers as typeof errors.helpers & {
       wrap: (error: unknown, name: string, message: string) => Error
     }

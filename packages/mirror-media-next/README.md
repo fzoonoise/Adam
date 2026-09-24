@@ -198,16 +198,19 @@ Legacy bridge 不承接新的 ownership。等六個元件完成 `.tsx` 遷移、
 
 ### Current membership and commerce ownership（目前會員與商務能力所有權）
 
-P7 已建立四個有實際 consumers（使用端）的 capability modules（能力模組）：
+P7 已建立七個有實際 consumers（使用端）的 capability modules（能力模組）：
 
 - `modules/membership/` 持有 Firebase auth observer（驗證觀察者）、會員 context（狀態內容）、WAS access token（存取權杖）、會員型別與登入保護 hook（掛鉤）。`pages/_app.js` 可掛載 `MembershipProvider`；shell、會員頁、廣告與紀錄元件只透過其公開 context 操作讀取狀態或登出。
 - `modules/authentication/` 持有登入、註冊、密碼重設與 Firebase email action（電子郵件動作）的表單元件、Redux UI state（使用者介面狀態）及流程工具。它可依賴 `modules/membership/membership-types.ts` 的型別契約，不接管全站會員 session（工作階段）的生命週期。
 - `modules/account/` 持有個人資料的型別、GraphQL data functions（資料函式）與表單元件；它透過 `modules/membership/membership-context.tsx` 取得呼叫會員 API 所需的公開狀態。
 - `modules/magazine/` 持有動態雜誌的 codegen-derived GraphQL types（由程式碼產生器衍生的圖形查詢型別）、client data loading（用戶端資料載入）、slug validation（網址識別字驗證）、排序、iframe allowlist（內嵌框架允許清單）與 UI。它可讀取 `modules/membership/` 的公開會員狀態，但不得接管登入或 route policy（路由政策）。
+- `modules/subscription/` 持有會員方案、價格、注意事項及方案 UI；價格是 magazine 與 story CTA 可讀取的公開 subscription contract（訂閱契約），route feature toggle（功能開關）與 GSSP 仍由 `pages/subscribe/**` 持有。
+- `modules/paper-magazine/` 持有紙本雜誌方案、訂購表單、NewebPay payload validation（藍新金流酬載驗證）、GraphQL codegen-derived order types（由程式碼生成衍生的訂單型別）與結果 UI。`pages/api/papermag.ts` 保留 HTTP policy（政策）及加密付款協調，`pages/papermag/return.tsx` 保留 raw POST parsing（原始請求解析）與 redirect policy（轉導政策）。
+- `modules/commerce/checkout-steps.tsx` 是 subscription 與 paper-magazine 共同使用的商務流程元件；它只呈現訂購階段，不持有任一路由、付款或會員政策。
 
 `components/shell/header/member-menu.tsx` 可讀取 membership context，並使用 `authentication-state.ts` 將登入表單切回起始狀態；這是 shell 呈現登入／登出操作所需的公開狀態操作，不把 session 或表單生命週期移進 shell。
 
-對應的 `pages/login`、`pages/profile`、`pages/recover-password`、`pages/update-password`、`pages/email-handler`、密碼結果頁與 `pages/magazine/**` 只保留 route exports（路由匯出）、GSSP、cache／redirect／404 policy（快取／轉導／找不到政策）、SEO 與頁面組合。四個 module 均不得 import `pages/**`；shared membership module（共用會員模組）也不得反向依賴 account 或 authentication。這些邊界由 root ESLint config（根目錄 ESLint 設定）的 path-specific restrictions（路徑限制）執行。
+對應的 `pages/login`、`pages/profile`、`pages/recover-password`、`pages/update-password`、`pages/email-handler`、密碼結果頁、`pages/magazine/**`、`pages/subscribe/**` 與 `pages/papermag/**` 只保留 route exports（路由匯出）、GSSP、cache／redirect／404 policy（快取／轉導／找不到政策）、SEO、HTTP ingress（進入點）與頁面組合。七個 module 均不得 import `pages/**`；shared membership module（共用會員模組）也不得反向依賴 account 或 authentication。這些邊界由 root ESLint config（根目錄 ESLint 設定）的 path-specific restrictions（路徑限制）執行。
 
 ### Ownership and placement（所有權與放置規則）
 
