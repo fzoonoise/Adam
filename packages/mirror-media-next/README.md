@@ -120,29 +120,60 @@ packages/mirror-media-next/
 │   ├── index.tsx                       # Homepage route composition
 │   └── podcasts/index.tsx              # Podcast route composition
 ├── modules/                            # Business capabilities, shallow by default
-│   ├── account/                        # Member profile data, types and UI
-│   ├── authentication/                 # Login, registration and password flows
+│   ├── account/                        # Member profile
+│   │   ├── account-types.ts            # Types derived from GraphQL codegen
+│   │   ├── account-data.ts             # Profile query and update mutation
+│   │   └── components/                 # Profile form, save states and deletion link
+│   ├── authentication/                 # Login, registration, password and Firebase email actions
+│   │   ├── authentication-state.ts     # Redux login form state
+│   │   ├── authentication-actions.ts   # Firebase and Israfel member actions
+│   │   ├── authentication-form.ts
+│   │   ├── authentication-utils.ts
+│   │   ├── authentication-redirect.ts  # Same-origin post-login destination
+│   │   ├── use-authentication-redirect.ts
+│   │   └── components/                 # Login, password and email-action UI
+│   ├── commerce/
+│   │   └── checkout-steps.tsx          # Checkout steps shared by subscription and paper magazine
 │   ├── homepage/
 │   │   ├── homepage-types.ts           # Homepage-owned view-model types
 │   │   ├── homepage-data.ts            # Server data aggregation
 │   │   ├── homepage-client-data.ts     # Browser load-more boundary
 │   │   ├── homepage-static-json.schema.ts
 │   │   └── components/                 # Homepage-owned UI
+│   ├── magazine/                       # Digital magazine
+│   │   ├── magazine-types.ts           # Types derived from GraphQL codegen
+│   │   ├── magazine-data.ts            # Loading, ordering, slug validation and iframe allowlist
+│   │   └── components/
 │   ├── membership/                     # Shared auth state, token and access guard
-│   └── podcast/
-│       ├── podcast-types.ts            # Podcast-owned view-model types
-│       ├── podcast-data.ts             # Fetch, validate and normalize Podcast data
-│       └── components/                 # Podcast-owned UI
-│           ├── audio-player.tsx
-│           ├── author-select-dropdown.tsx
-│           ├── play-pause-button.tsx
-│           ├── podcast-card.tsx
-│           ├── podcast-list.tsx
-│           └── podcast-modal.tsx
+│   │   ├── membership-context.tsx      # Firebase auth observer and MembershipProvider
+│   │   ├── membership-token.ts         # WAS access token and JWT role, Zod monitor mode
+│   │   ├── membership-types.ts
+│   │   └── use-membership-required.ts  # Client-side login guard
+│   ├── paper-magazine/                 # Paper magazine plans, order form and NewebPay
+│   │   ├── paper-magazine-types.ts
+│   │   ├── paper-magazine-data.ts      # Plans and order/NewebPay Zod schemas
+│   │   └── components/
+│   ├── podcast/
+│   │   ├── podcast-types.ts            # Podcast-owned view-model types
+│   │   ├── podcast-data.ts             # Fetch, validate and normalize Podcast data
+│   │   └── components/                 # Podcast-owned UI
+│   │       ├── audio-player.tsx
+│   │       ├── author-select-dropdown.tsx
+│   │       ├── play-pause-button.tsx
+│   │       ├── podcast-card.tsx
+│   │       ├── podcast-list.tsx
+│   │       └── podcast-modal.tsx
+│   ├── subscription/                   # Membership plans, prices and notices
+│   │   ├── subscription-types.ts
+│   │   ├── subscription-data.ts
+│   │   └── components/
+│   └── <other capabilities>/           # aside, author, category, external(s), list-article, search, section, story, tag, topic
 ├── components/
 │   ├── ui/                             # Domain-neutral design-system primitives
 │   ├── common/                         # Proven domain-neutral composed UI/controllers
-│   │   └── carousel-ticker.tsx         # Shared carousel cadence and pause coordination
+│   │   ├── carousel-ticker.tsx         # Shared carousel cadence and pause coordination
+│   │   ├── dable-ad.tsx                # Dable widget shared by story and external pages
+│   │   └── form-wrapper.tsx            # Card shared by login, account, password and email-action flows
 │   └── shell/                          # Application Layout/Header/Footer ownership
 ├── apollo/                             # GraphQL clients, sources, and generated output
 ├── axios/                              # Existing HTTP compatibility wrapper
@@ -226,15 +257,14 @@ P7 已建立七個有實際 consumers（使用端）的 capability modules（能
 | `type/**`、`types/**`                                    | `type/` 不再新增；`types/` 只放 ambient declarations（環境宣告）                        |
 
 `components/ui/` 以 shadcn UI 為主。由 shadcn 衍生／客製，以及專案依相同慣例撰寫的低階 primitives 都可放在這裡；元件不得包含 route 或 business behavior（業務行為）。
-新程式碼直接從 `@/components/ui/<component>` 匯入；既有 `components/ui/index.ts` 只保留 compatibility exports（相容匯出），不擴張為第二個 public registry（公開登錄庫）。
 
-`PageShell` 是 `components/shell/` 唯一的頁面外殼組合入口，也是一般非 AMP UI routes（使用者介面路由）的標準入口。它直接擁有 application shell（應用外殼）的 flex／`min-h-dvh` 結構與 slot order（插槽順序），固定組合 `CustomHead`、`SiteHeader`、`GDPRNotification` 與 `BackToTop`，預設加入 `SiteFooter` 與 `IdleTimeoutModal`。route-specific metadata（路由專屬中繼資料）透過 `head` prop（屬性）傳入；route 只有在補充文章時間、AMP link 或 JSON-LD 等特殊標籤時才另外使用 `next/head`，不應再自行 render `CustomHead`。只有已確認需保留原畫面的頁面才可使用 `withFooter={false}` 或 `withIdleTimeout={false}`；route 不應自行建立另一套 shell variant（外殼變體）。AMP routes 維持獨立 `components/amp/amp-layout`；`pages/500.js` 是不依賴資料與 shell 的靜態錯誤後備，兩者都不使用 `PageShell`，並直接組合 `CustomHead`。`_app.js` 也必須在 `/500` 排除 client-only `PromoteTopic`（僅用戶端專題推薦），避免錯誤畫面重新引入內容請求。
+**PageShell**：一般非 AMP 頁面使用 `components/shell/` 的 `PageShell`。
 
-`CustomHead` 提供站台預設的 `<meta name="robots" content="index, max-image-preview:large">` 與預設分享圖片；特殊頁面可透過 `robotsMetaContent` 覆寫，傳入 `null` 則代表該 route 的另一個 `Head` 負責 robots 規則。帳號流程與 404／500 必須明確使用 `noindex`，不可落回公開頁面的預設值。
-
-`components/shared/layout.js`、`components/shared/layout-full.js` 與 `LegacyLayoutAdapter` 只保留既有 JavaScript routes 的 compatibility facade（相容介面），render path（渲染路徑）同樣委派給 `PageShell`，不再保留裸 DOM flow、premium header 或 empty shell 分支；consumer（使用端）遷移完畢後刪除。
-
-`PageShell` 不在 render path 自行取得 Header data；使用它的 Pages Router route 必須在所屬 data boundary（資料邊界）呼叫 `fetchShellHeaderData()`，再以 serializable props（可序列化屬性）傳入。`fetchShellHeaderData()` 固定取得 flash news（快訊），不提供 opt-in；active navigation（作用中導覽）仍由 route 提供。仍使用 legacy header fetcher（舊頁首資料函式）的 compatibility routes 也必須把 `flashNewsData` 傳入 facade。500 的靜態錯誤後備不取任何 shell data，因此不受此契約約束。
+- route 在 `getServerSideProps` 呼叫 `fetchShellHeaderData()`，把結果當 props 傳入。
+- 頁面 metadata 透過 `head` prop 傳入。`CustomHead` 預設可被索引；帳號流程與 404／500 要設 `noindex`。
+- 只有需要保留原畫面的頁面才使用 `withFooter={false}` 或 `withIdleTimeout={false}`。
+- AMP 頁面使用 `components/amp/amp-layout`；`pages/500.js` 是不取資料的靜態錯誤頁。兩者都不使用 `PageShell`。
+- `components/shared/layout.js`、`layout-full.js` 與 `LegacyLayoutAdapter` 是讓既有 JavaScript routes 接到 `PageShell` 的相容層，使用端遷移完後刪除。
 
 ### Component placement guide（元件放置指南）
 
@@ -265,7 +295,7 @@ Route 與 capability 是不同分類軸：route 是 framework／runtime entry（
 
 ### Dependency boundaries（依賴邊界）
 
-以下 dependency boundaries（依賴邊界）是目前的 code-review contract（程式碼審查契約），尚未由專用 ESLint 規則自動強制。
+`modules/**` 不得匯入 `pages/**`，以及 `modules/membership/` 不得依賴 `modules/account/` 或 `modules/authentication/`，這兩條由 `eslint.config.mjs` 強制；以下其餘邊界靠 code review 維持。
 
 - `pages/**` 可組合 modules、shell、common、design-system UI 與遷移中的 Legacy components，但不可依賴另一個 page 的 route policy。
 - Module components／hooks 可依賴同 module、核准的其他 capability public contract、common、design-system UI 與 browser-safe utilities。
