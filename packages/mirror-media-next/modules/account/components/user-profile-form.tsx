@@ -7,6 +7,8 @@ import utc from 'dayjs/plugin/utc'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Typography } from '@/components/ui/typography'
 import { useMembership } from '@/modules/membership/membership-context'
 import { generateErrorReportInfo } from '@/utils/log/error-log'
 import { sendErrorLog } from '@/utils/log/send-log'
@@ -208,15 +210,22 @@ export default function UserProfileForm({
   return (
     <form className="flex flex-col gap-y-10 legacy-xl:rounded-mm-xs legacy-xl:border legacy-xl:border-mm-neutral-200 legacy-xl:p-10">
       <div className="break-words">
-        <h2 className={largeLabelClassName}>Email</h2>
-        <p className="min-h-7 text-lg leading-normal font-normal text-mm-neutral-800">
+        <Typography as="h2" className={largeLabelClassName} variant="h5">
+          Email
+        </Typography>
+        <Typography
+          className="min-h-7 leading-normal text-mm-neutral-800"
+          variant="body-l"
+        >
           {userEmail}
-        </p>
+        </Typography>
       </div>
 
       {signInProvider == 'password' && (
         <div>
-          <h2 className={largeLabelClassName}>密碼</h2>
+          <Typography as="h2" className={largeLabelClassName} variant="h5">
+            密碼
+          </Typography>
           <div className="w-26">
             <Button
               type="button"
@@ -232,9 +241,9 @@ export default function UserProfileForm({
 
       <div className="flex flex-col gap-10 md:flex-row md:gap-4">
         <div className="flex w-full flex-col">
-          <label className={largeLabelClassName} htmlFor="name">
+          <Label className={largeLabelClassName} htmlFor="name">
             姓名
-          </label>
+          </Label>
           <Input
             id="name"
             placeholder="請輸入姓名"
@@ -255,13 +264,15 @@ export default function UserProfileForm({
       </div>
 
       <div>
-        <h2 className={sectionTitleClassName}>生日</h2>
+        <Typography as="h2" className={sectionTitleClassName} variant="h5">
+          生日
+        </Typography>
 
         <div className="flex flex-col gap-6 md:flex-row md:gap-4">
           <div className="flex flex-1 flex-col">
-            <label className={smallLabelClassName} htmlFor="year">
+            <Label className={smallLabelClassName} htmlFor="year">
               西元年
-            </label>
+            </Label>
             <Input
               id="year"
               placeholder="西元年"
@@ -280,9 +291,9 @@ export default function UserProfileForm({
             />
           </div>
           <div className="flex flex-1 flex-col">
-            <label className={smallLabelClassName} htmlFor="day">
+            <Label className={smallLabelClassName} htmlFor="day">
               日期
-            </label>
+            </Label>
             <Input
               id="day"
               placeholder="日期"
@@ -294,9 +305,9 @@ export default function UserProfileForm({
       </div>
 
       <div className="flex w-full flex-col">
-        <label className={largeLabelClassName} htmlFor="phone">
+        <Label className={largeLabelClassName} htmlFor="phone">
           電話
-        </label>
+        </Label>
         <Input
           id="phone"
           type="tel"
@@ -306,7 +317,9 @@ export default function UserProfileForm({
         />
       </div>
       <div>
-        <h2 className={sectionTitleClassName}>地址</h2>
+        <Typography as="h2" className={sectionTitleClassName} variant="h5">
+          地址
+        </Typography>
         <div className="flex flex-col gap-6">
           <div className="flex flex-1 flex-col">
             <DropdownMenu
@@ -341,9 +354,9 @@ export default function UserProfileForm({
           </div>
 
           <div className="flex flex-1 flex-col">
-            <label className={smallLabelClassName} htmlFor="address">
+            <Label className={smallLabelClassName} htmlFor="address">
               詳細地址
-            </label>
+            </Label>
             <Input
               id="address"
               placeholder="請輸入街道、門號、巷弄、樓層等資訊"

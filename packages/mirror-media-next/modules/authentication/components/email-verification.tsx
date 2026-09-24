@@ -10,6 +10,7 @@ import { FirebaseError } from 'firebase/app'
 import { applyActionCode } from 'firebase/auth'
 
 import FormWrapper from '@/components/common/form-wrapper'
+import { Typography } from '@/components/ui/typography'
 import { FirebaseAuthError } from '@/constants/firebase'
 import { auth } from '@/firebase'
 import { useMembership } from '@/modules/membership/membership-context'
@@ -78,13 +79,16 @@ export default function BodyEmailVerification() {
 
   const getFailedContent = () => {
     const secondaryBlock = (
-      <p className="mt-4 font-mm-sans text-lg leading-normal text-mm-neutral-500">
+      <Typography
+        className="mt-4 leading-normal text-mm-neutral-500"
+        variant="body-l"
+      >
         或是聯繫客服信箱{' '}
         <StyledLink href="mailto:mm-onlineservice@mirrormedia.mg">
           mm-onlineservice@mirrormedia.mg
         </StyledLink>{' '}
         / 致電 (02)6633-3966 由專人為您服務。
-      </p>
+      </Typography>
     )
 
     let primaryTextWording: ReactNode
@@ -126,9 +130,13 @@ export default function BodyEmailVerification() {
     return (
       <>
         <div className="mb-8">
-          <p className="font-mm-sans text-2xl leading-normal font-medium break-all text-mm-neutral-800">
+          <Typography
+            as="p"
+            className="leading-normal font-medium break-all text-mm-neutral-800"
+            variant="h3"
+          >
             {primaryTextWording}
-          </p>
+          </Typography>
           {secondaryBlock}
         </div>
         <PrimaryButton onClick={onClick}>{primaryButtonWording}</PrimaryButton>
@@ -167,13 +175,20 @@ export default function BodyEmailVerification() {
     return (
       <>
         <div className="mb-6">
-          <p className="font-mm-sans text-2xl leading-normal font-medium break-all text-mm-neutral-800">
+          <Typography
+            as="p"
+            className="leading-normal font-medium break-all text-mm-neutral-800"
+            variant="h3"
+          >
             {primaryTextWording}
-          </p>
+          </Typography>
           {!isLoggedIn && (
-            <p className="mt-3 font-mm-sans text-lg leading-normal text-mm-neutral-500">
+            <Typography
+              className="mt-3 leading-normal text-mm-neutral-500"
+              variant="body-l"
+            >
               請重新登入，繼續完成訂購流程
-            </p>
+            </Typography>
           )}
         </div>
         <PrimaryButton onClick={onClick}>{primaryButtonWording}</PrimaryButton>

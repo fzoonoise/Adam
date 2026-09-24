@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { confirmPasswordReset, verifyPasswordResetCode } from 'firebase/auth'
 
 import FormWrapper from '@/components/common/form-wrapper'
+import { Typography } from '@/components/ui/typography'
 import { auth } from '@/firebase'
 import { getSearchParamFromApiKeyUrl, isValidPassword } from '@/utils'
 import { generateErrorReportInfo } from '@/utils/log/error-log'
@@ -95,9 +96,13 @@ export default function BodyPasswordReset() {
         {isInitialized ? (
           <>
             <div className="mb-6 flex flex-col gap-4">
-              <p className="font-mm-sans text-2xl leading-normal font-medium text-mm-neutral-800">
+              <Typography
+                as="p"
+                className="leading-normal font-medium text-mm-neutral-800"
+                variant="h3"
+              >
                 請輸入新的密碼
-              </p>
+              </Typography>
               <GenericPasswordInput
                 placeholder="密碼大於 6 位數"
                 state={validity}

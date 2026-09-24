@@ -1,17 +1,13 @@
-import type { ComponentPropsWithoutRef } from 'react'
-import NextLink from 'next/link'
-
 import { cn } from '@/components/cn'
+import { Link, type LinkProps } from '@/components/ui/link'
 
-type StyledLinkProps = ComponentPropsWithoutRef<typeof NextLink>
+type StyledLinkProps = LinkProps
 
 export default function StyledLink({ className, ...props }: StyledLinkProps) {
   return (
-    <NextLink
-      className={cn(
-        'text-mm-second-500 underline-offset-4 outline-none hover:text-mm-second-700 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mm-all-black focus-visible:outline-solid',
-        className
-      )}
+    <Link
+      variant="plain"
+      className={cn('text-mm-second-500 hover:text-mm-second-700', className)}
       {...props}
     />
   )

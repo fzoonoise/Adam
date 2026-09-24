@@ -1,5 +1,6 @@
 import FormWrapper from '@/components/common/form-wrapper'
 import { Button } from '@/components/ui/button'
+import { Typography } from '@/components/ui/typography'
 
 type SaveFailedProps = {
   onReset: () => void
@@ -9,12 +10,19 @@ export default function SaveFailed({ onReset }: SaveFailedProps) {
   return (
     <main className="flex flex-col items-center">
       <FormWrapper variant="compact">
-        <p className="text-2xl leading-normal font-medium text-mm-neutral-800 not-italic">
+        <Typography
+          as="p"
+          className="leading-normal font-medium text-mm-neutral-800 not-italic"
+          variant="h3"
+        >
           儲存失敗
-        </p>
-        <p className="mt-4 mb-8 text-lg leading-normal font-normal text-mm-neutral-500 not-italic">
+        </Typography>
+        <Typography
+          className="mt-4 mb-8 leading-normal text-mm-neutral-500 not-italic"
+          variant="body-l"
+        >
           請稍候再操作
-        </p>
+        </Typography>
         <Button
           type="button"
           variant="outline"

@@ -3,6 +3,7 @@ import { FirebaseError } from 'firebase/app'
 import { sendPasswordResetEmail } from 'firebase/auth'
 
 import FormWrapper from '@/components/common/form-wrapper'
+import { Typography } from '@/components/ui/typography'
 import { ACTION_CODE_SETTING } from '@/config/index.mjs'
 import { FirebaseAuthError } from '@/constants/firebase'
 import { SECOND } from '@/constants/time-unit'
@@ -121,13 +122,17 @@ export default function RecoverPasswordForm({
   return (
     <FormWrapper>
       <div className="flex flex-col gap-4">
-        <p className="font-mm-sans text-2xl leading-normal font-medium text-mm-neutral-800">
+        <Typography
+          as="p"
+          className="leading-normal font-medium text-mm-neutral-800"
+          variant="h3"
+        >
           如果您忘記/尚未設定密碼
-        </p>
-        <p className="font-mm-sans text-mm-body2 text-mm-neutral-400">
+        </Typography>
+        <Typography className="text-mm-neutral-400" variant="body2">
           請輸入您註冊時使用的 Email 信箱。我們會發送一封 Email
           到這個地址，裡面附有重設/設定密碼的連結。
-        </p>
+        </Typography>
       </div>
       <div className="mt-8 flex flex-col gap-6">
         <GenericTextInput

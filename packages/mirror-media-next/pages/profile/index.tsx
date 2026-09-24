@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { GetServerSideProps } from 'next'
 
 import LayoutFull from '../../components/shared/layout-full'
+import { Typography } from '../../components/ui/typography'
 import type { SaveResult } from '../../modules/account/account-types'
 import SaveFailed from '../../modules/account/components/save-failed'
 import SaveSuccess from '../../modules/account/components/save-success'
@@ -63,9 +64,13 @@ export default function Profile({ headerData, signInProvider }: ProfileProps) {
     >
       {savedStatus === MODE.FORM && (
         <main className="mx-auto w-full max-w-149 overflow-x-hidden px-5 py-10 md:w-150 md:max-w-none md:overflow-x-visible md:px-0 md:py-15 legacy-xl:w-170">
-          <h1 className="mb-6 text-2xl leading-9 font-medium md:mb-3">
+          <Typography
+            as="h1"
+            className="mb-6 leading-9 font-medium md:mb-3"
+            variant="h3"
+          >
             個人資料
-          </h1>
+          </Typography>
           <UserProfileForm
             onSaved={handleSaved}
             signInProvider={signInProvider}

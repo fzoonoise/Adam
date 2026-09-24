@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 
 import FormWrapper from '@/components/common/form-wrapper'
+import { Typography } from '@/components/ui/typography'
 import { SECOND } from '@/constants/time-unit'
 import { logout } from '@/modules/membership/membership-context'
 
@@ -22,14 +23,21 @@ export default function PasswordChangeSuccess() {
 
   return (
     <FormWrapper>
-      <p className="font-mm-sans text-2xl leading-normal font-medium text-mm-neutral-800">
+      <Typography
+        as="p"
+        className="leading-normal font-medium text-mm-neutral-800"
+        variant="h3"
+      >
         變更密碼成功！
         <br />
         請重新登入
-      </p>
-      <p className="mt-8 font-mm-sans text-lg leading-normal text-mm-neutral-400">
+      </Typography>
+      <Typography
+        className="mt-8 leading-normal text-mm-neutral-400"
+        variant="body-l"
+      >
         將於 {REDIRECTION_DELAY} 秒後自動跳轉至會員登入...
-      </p>
+      </Typography>
     </FormWrapper>
   )
 }

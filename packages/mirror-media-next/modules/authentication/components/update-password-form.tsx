@@ -6,6 +6,7 @@ import {
   type UserCredential,
 } from 'firebase/auth'
 
+import { Label } from '@/components/ui/label'
 import { auth } from '@/firebase'
 import { isValidPassword } from '@/utils'
 import { generateErrorReportInfo } from '@/utils/log/error-log'
@@ -89,12 +90,12 @@ export default function MainForm() {
   return (
     <form className="mt-4 flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <label
+        <Label
           htmlFor="current-password"
           className="font-mm-sans text-lg leading-normal text-mm-neutral-800"
         >
           請輸入目前密碼
-        </label>
+        </Label>
         <GenericPasswordInput
           id="current-password"
           placeholder="目前密碼"
@@ -105,12 +106,12 @@ export default function MainForm() {
         />
       </div>
       <div className="flex flex-col gap-2">
-        <label
+        <Label
           htmlFor="new-password"
           className="font-mm-sans text-lg leading-normal text-mm-neutral-800"
         >
           請輸入新密碼
-        </label>
+        </Label>
         <GenericPasswordInput
           id="new-password"
           placeholder="密碼須在 6 位數以上"
@@ -122,12 +123,12 @@ export default function MainForm() {
         />
       </div>
       <div className="flex flex-col gap-2">
-        <label
+        <Label
           htmlFor="new-password-check"
           className="font-mm-sans text-lg leading-normal text-mm-neutral-800"
         >
           請再次輸入新密碼
-        </label>
+        </Label>
         <GenericPasswordInput
           id="new-password-check"
           placeholder="再次輸入新密碼"

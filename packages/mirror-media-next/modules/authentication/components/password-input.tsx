@@ -1,5 +1,6 @@
 import { type ChangeEventHandler, useState } from 'react'
 
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import IconConceal from '@/public/images-next/login/conceal.svg'
 import IconReveal from '@/public/images-next/login/reveal.svg'
@@ -43,11 +44,13 @@ export default function GenericPasswordInput({
           hasError={state === InputState.Invalid}
           className="pr-10"
         />
-        <button
+        <Button
           type="button"
+          size="icon-sm"
+          variant="ghost"
           aria-label={isConcealed ? '顯示密碼' : '隱藏密碼'}
           aria-pressed={!isConcealed}
-          className="absolute top-1/2 right-1 flex size-8 -translate-y-1/2 items-center justify-center rounded-mm-xs outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mm-all-black focus-visible:outline-solid"
+          className="absolute top-1/2 right-1 -translate-y-1/2 rounded-mm-xs"
           onClick={() => setIsConcealed((current) => !current)}
         >
           {isConcealed ? (
@@ -55,7 +58,7 @@ export default function GenericPasswordInput({
           ) : (
             <IconConceal className="size-6" />
           )}
-        </button>
+        </Button>
       </div>
       {getHint(state, {
         incompleteMessage,

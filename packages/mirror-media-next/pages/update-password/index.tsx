@@ -2,6 +2,7 @@ import type { GetServerSideProps } from 'next'
 
 import FormWrapper from '../../components/common/form-wrapper'
 import LayoutFull from '../../components/shared/layout-full'
+import { Typography } from '../../components/ui/typography'
 import MainForm from '../../modules/authentication/components/update-password-form'
 import useMembershipRequired from '../../modules/membership/use-membership-required'
 import { getLogTraceObject } from '../../utils'
@@ -34,9 +35,13 @@ export default function UpdatePassword({
       <div className="grow bg-white md:bg-mm-neutral-100">
         <main className="flex flex-col items-center">
           <FormWrapper>
-            <p className="font-mm-sans text-2xl leading-normal font-medium text-mm-neutral-800">
+            <Typography
+              as="p"
+              className="leading-normal font-medium text-mm-neutral-800"
+              variant="h3"
+            >
               變更密碼
-            </p>
+            </Typography>
             <MainForm />
           </FormWrapper>
         </main>

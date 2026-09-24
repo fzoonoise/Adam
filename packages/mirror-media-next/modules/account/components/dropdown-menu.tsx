@@ -1,3 +1,6 @@
+import { useId } from 'react'
+
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -27,6 +30,8 @@ export default function DropdownMenu({
   disabled = false,
   placeholder = '請選擇',
 }: DropdownMenuProps) {
+  const triggerId = useId()
+
   return (
     <Select<string>
       value={selectedOption || null}
@@ -36,8 +41,10 @@ export default function DropdownMenu({
       disabled={disabled}
       modal={false}
     >
-      <span className={labelClassName}>{label}</span>
-      <SelectTrigger aria-label={label} className="w-full">
+      <Label className={labelClassName} htmlFor={triggerId}>
+        {label}
+      </Label>
+      <SelectTrigger id={triggerId} className="w-full">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent
