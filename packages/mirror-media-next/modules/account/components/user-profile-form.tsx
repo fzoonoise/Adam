@@ -12,6 +12,7 @@ import { Typography } from '@/components/ui/typography'
 import { useMembership } from '@/modules/membership/membership-context'
 import { generateErrorReportInfo } from '@/utils/log/error-log'
 import { sendErrorLog } from '@/utils/log/send-log'
+import { normalizeError } from '@/utils/normalize-error'
 
 import { fetchAccountProfile, updateAccountProfile } from '../account-data'
 import type { District, SaveResult } from '../account-types'
@@ -135,7 +136,7 @@ export default function UserProfileForm({
           setUserAddress(address ?? '')
         }
       } catch (error) {
-        const errorReport = generateErrorReportInfo(error as Error, {
+        const errorReport = generateErrorReportInfo(normalizeError(error), {
           userEmail: userEmail,
           firebaseId: firebaseId,
           memberType: memberType,
@@ -197,7 +198,7 @@ export default function UserProfileForm({
       })
       onSaved('success')
     } catch (error) {
-      const errorReport = generateErrorReportInfo(error as Error, {
+      const errorReport = generateErrorReportInfo(normalizeError(error), {
         userEmail: userEmail,
         firebaseId: firebaseId,
         memberType: memberType,

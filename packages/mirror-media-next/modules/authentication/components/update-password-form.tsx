@@ -11,6 +11,7 @@ import { auth } from '@/firebase'
 import { isValidPassword } from '@/utils'
 import { generateErrorReportInfo } from '@/utils/log/error-log'
 import { sendErrorLog } from '@/utils/log/send-log'
+import { normalizeError } from '@/utils/normalize-error'
 
 import { InputState } from '../authentication-form'
 
@@ -58,9 +59,7 @@ export default function MainForm() {
         oldPassword
       )
     } catch (error) {
-      const normalizedError =
-        error instanceof Error ? error : new Error(String(error))
-      const errorReport = generateErrorReportInfo(normalizedError, {
+      const errorReport = generateErrorReportInfo(normalizeError(error), {
         userEmail: email,
       })
       sendErrorLog(errorReport)
@@ -73,9 +72,7 @@ export default function MainForm() {
       await updatePassword(userCredential.user, newPassword)
       void router.push('/password-change-success')
     } catch (error) {
-      const normalizedError =
-        error instanceof Error ? error : new Error(String(error))
-      const errorReport = generateErrorReportInfo(normalizedError, {
+      const errorReport = generateErrorReportInfo(normalizeError(error), {
         userEmail: email,
       })
       sendErrorLog(errorReport)

@@ -11,6 +11,7 @@ import { auth } from '@/firebase'
 import { isValidEmail } from '@/utils'
 import { generateErrorReportInfo } from '@/utils/log/error-log'
 import { sendErrorLog } from '@/utils/log/send-log'
+import { normalizeError } from '@/utils/normalize-error'
 import {
   getStorageItem,
   removeStorageItem,
@@ -82,9 +83,7 @@ export default function RecoverPasswordForm({
         setHintState(HINT_STATE.ERROR)
       }
 
-      const normalizedError =
-        error instanceof Error ? error : new Error(String(error))
-      const info = generateErrorReportInfo(normalizedError, {
+      const info = generateErrorReportInfo(normalizeError(error), {
         userEmail: email,
       })
       sendErrorLog(info)

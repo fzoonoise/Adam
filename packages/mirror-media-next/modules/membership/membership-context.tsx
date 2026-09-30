@@ -4,6 +4,7 @@ import type { User } from 'firebase/auth'
 
 import { generateErrorReportInfo } from '@/utils/log/error-log'
 import { sendErrorLog } from '@/utils/log/send-log'
+import { normalizeError } from '@/utils/normalize-error'
 
 import {
   getAccessToken,
@@ -118,7 +119,7 @@ const MembershipProvider = ({
         const idToken = await user.getIdToken()
         return idToken
       } catch (err) {
-        const errorLog = generateErrorReportInfo(err as Error, {
+        const errorLog = generateErrorReportInfo(normalizeError(err), {
           userEmail: user.email,
           firebaseId: user.uid,
         })
@@ -132,7 +133,7 @@ const MembershipProvider = ({
       try {
         return getMemberTypeFromAccessToken(accessToken)
       } catch (e) {
-        const errorLog = generateErrorReportInfo(e as Error, {
+        const errorLog = generateErrorReportInfo(normalizeError(e), {
           userEmail: user.email,
           firebaseId: user.uid,
         })
@@ -195,7 +196,7 @@ const MembershipProvider = ({
               break
             case 500:
             default: {
-              const errorLog = generateErrorReportInfo(error as Error, {
+              const errorLog = generateErrorReportInfo(normalizeError(error), {
                 userEmail: user.email,
                 firebaseId: user.uid,
               })
@@ -264,7 +265,7 @@ const handleFirebaseSignOut = async (): Promise<void> => {
   try {
     await signOut(auth)
   } catch (error) {
-    const errorLog = generateErrorReportInfo(error as Error, {
+    const errorLog = generateErrorReportInfo(normalizeError(error), {
       userEmail: currentUser?.email,
       firebaseId: currentUser?.uid,
     })

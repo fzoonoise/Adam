@@ -11,6 +11,7 @@ import { auth } from '@/firebase'
 import { useAppDispatch, useAppSelector } from '@/hooks/useRedux'
 import { getAccessToken } from '@/modules/membership/membership-token'
 import { isValidEmail, isValidPassword } from '@/utils'
+import { normalizeError } from '@/utils/normalize-error'
 
 import {
   errorHandler,
@@ -73,9 +74,7 @@ export default function MainFormLoginWithPassword() {
       ) {
         setPasswordInputState(InputState.Invalid)
       } else {
-        const normalizedError =
-          error instanceof Error ? error : new Error(String(error))
-        void errorHandler(normalizedError, { userEmail: email })
+        void errorHandler(normalizeError(error), { userEmail: email })
         dispatch(loginActions.changeState(FormState.LoginFail))
       }
     } finally {

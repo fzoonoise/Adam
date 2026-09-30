@@ -9,6 +9,8 @@ import {
   getDeviceInfo,
   getFormattedPageType,
   getWindowSizeInfo,
+  type LogContextPayload,
+  type LogPageInfo,
 } from '../shared'
 
 /**
@@ -18,10 +20,8 @@ import {
  * always hand it one `message`, formatted as `<Name>: <message>` followed by the stack frames —
  * the shape it knows how to parse
  * (see https://cloud.google.com/error-reporting/docs/formatting-error-messages).
- * @param {Error} error
- * @returns {string}
  */
-const formatErrorMessage = (error) => {
+const formatErrorMessage = (error: Error): string => {
   const header = `${error.name || 'Error'}: ${error.message}`
   const stack = typeof error.stack === 'string' ? error.stack.trim() : ''
 
@@ -29,17 +29,6 @@ const formatErrorMessage = (error) => {
   // V8 stacks already start with the header; Firefox/Safari stacks are frames only.
   return stack.startsWith(header) ? stack : `${header}\n${stack}`
 }
-
-/**
- *
- * @typedef {import('../../../modules/membership/membership-types').MemberType} MemberType
- *
- * @typedef {Object} Payload
- * @property {MemberType} [memberType] - type of member
- * @property {string | null} [userEmail] - member email
- * @property {string} [firebaseId] - member firebase id
- * @property {boolean} [isMemberArticle] - whether is member article. It will only be `true` if it is on story page and is a member article.
- */
 
 /**
  * Generate information for error report.
@@ -50,13 +39,11 @@ const formatErrorMessage = (error) => {
  *
  * Caution: Since this function have use Web API, such as `window.location.href`, `window.navigator.userAgent`,
  * this function should be ONLY executed at client-side.
- * @param {Error} error
- * @param {Payload} payload
  * @throws {Error}
  */
 const generateErrorReportInfo = (
-  error,
-  payload = {
+  error: Error,
+  payload: LogContextPayload = {
     memberType: 'not-member',
     userEmail: '',
     firebaseId: '',
@@ -68,7 +55,7 @@ const generateErrorReportInfo = (
   const pathname = window.location.pathname
   const {
     memberType = 'not-member',
-    userEmail = '',
+    userEmail,
     firebaseId = '',
     isMemberArticle = false,
   } = payload
@@ -84,7 +71,7 @@ const generateErrorReportInfo = (
     ip: '',
     userInfo: {
       'member-type': memberType,
-      email: userEmail,
+      email: userEmail ?? '',
       'firebase-id': firebaseId,
     },
     browser: getBrowserInfo(userAgent),
@@ -92,14 +79,14 @@ const generateErrorReportInfo = (
     'is-in-app-browser': detectIsInApp(userAgent),
     'screen-size': getWindowSizeInfo(),
   }
-  const pageInfo = {
+  const pageInfo: LogPageInfo = {
     referral: document.referrer,
     'page-url': window.location.href,
     'page-type': getFormattedPageType(pathname, isMemberArticle),
   }
 
   if (pathname.startsWith('/story/')) {
-    pageInfo['story-slug'] = pathname.split('/story/')?.[1] ?? ''
+    pageInfo['story-slug'] = pathname.split('/story/')[1] ?? ''
   }
 
   return {

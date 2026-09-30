@@ -10,6 +10,7 @@ import { FirebaseAuthError } from '@/constants/firebase'
 import { auth } from '@/firebase'
 import { useAppDispatch, useAppSelector } from '@/hooks/useRedux'
 import { useMembership } from '@/modules/membership/membership-context'
+import { normalizeError } from '@/utils/normalize-error'
 
 import {
   errorHandler,
@@ -95,9 +96,7 @@ export default function LoginPageContent({ isWebview }: LoginPageContentProps) {
             )
           )
         } else {
-          const normalizedError =
-            error instanceof Error ? error : new Error(String(error))
-          void errorHandler(normalizedError, { userEmail })
+          void errorHandler(normalizeError(error), { userEmail })
           dispatch(loginActions.changeState(FormState.LoginFail))
         }
       } finally {

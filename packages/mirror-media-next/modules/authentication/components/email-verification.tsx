@@ -17,6 +17,7 @@ import { useMembership } from '@/modules/membership/membership-context'
 import { getSearchParamFromApiKeyUrl } from '@/utils'
 import { generateErrorReportInfo } from '@/utils/log/error-log'
 import { sendErrorLog } from '@/utils/log/send-log'
+import { normalizeError } from '@/utils/normalize-error'
 
 import PrimaryButton from './primary-button'
 import StyledLink from './styled-link'
@@ -65,9 +66,7 @@ export default function BodyEmailVerification() {
 
         if (error instanceof FirebaseError) setErrorType(error.code)
 
-        const normalizedError =
-          error instanceof Error ? error : new Error(String(error))
-        const errorReport = generateErrorReportInfo(normalizedError, {
+        const errorReport = generateErrorReportInfo(normalizeError(error), {
           userEmail,
           firebaseId,
           memberType: memberInfo?.memberType,

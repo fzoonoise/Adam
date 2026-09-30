@@ -1,26 +1,17 @@
-import type { FirebaseError } from 'firebase/app'
 import type { User } from 'firebase/auth'
 
 import client from '@/apollo/apollo-client'
 import { createMember } from '@/apollo/membership/mutation/member'
 import { fetchAllMember } from '@/apollo/membership/query/member'
-import type {
-  Membership,
-  MemberType,
-} from '@/modules/membership/membership-types'
+import type { Membership } from '@/modules/membership/membership-types'
 import { generateErrorReportInfo } from '@/utils/log/error-log'
 import { sendErrorLog } from '@/utils/log/send-log'
+import type { LogContextPayload } from '@/utils/log/shared'
+import { normalizeError } from '@/utils/normalize-error'
 
 import { FormState, type LoginFormState } from './authentication-state'
 
 type AccessToken = Membership['accessToken']
-type ErrorPayload = {
-  memberType?: MemberType
-  userEmail?: string | null
-  firebaseId?: string
-  isMemberArticle?: boolean
-}
-
 /**
  * there are 3 error situation:
  * 1: has firebase auth, but no member data in Israfel(login)
@@ -32,8 +23,8 @@ type ErrorPayload = {
  * do nothing with the firebase auth object
  */
 const errorHandler = async (
-  error: Error | FirebaseError,
-  payload?: ErrorPayload
+  error: Error,
+  payload?: LogContextPayload
 ): Promise<void> => {
   const [{ auth }, { signOut }] = await Promise.all([
     import('@/firebase'),
@@ -41,8 +32,8 @@ const errorHandler = async (
   ])
   const currentUser = auth.currentUser
   if (
-    error?.message === "GraphQL error: Can't find data in Israfel" ||
-    error?.message === "this member's email has been used in Israfel"
+    error.message === "GraphQL error: Can't find data in Israfel" ||
+    error.message === "this member's email has been used in Israfel"
   ) {
     currentUser?.delete()
   }
@@ -86,12 +77,13 @@ const createMemberDataInIsrafel = async (
       },
     })
   } catch (error) {
+    const normalizedError = normalizeError(error)
     const errorMessage =
-      (error as Error).message.search(
+      normalizedError.message.search(
         'Unique constraint failed on the fields'
       ) !== -1
         ? "this member's email has been used in Israfel"
-        : (error as Error).message
+        : normalizedError.message
 
     throw new Error(errorMessage)
   }
@@ -121,7 +113,7 @@ const fetchBasicMemberInfoInIsrafel = async (
       throw "GraphQL error: Can't find data in Israfel, please check if this member's data existed in Israfel"
     }
   } catch (error) {
-    throw new Error(error as string)
+    throw new Error(String(error))
   }
 }
 

@@ -21,6 +21,7 @@ import { NEWEBPAY_PAPERMAG_API_URL } from '@/config/index.mjs'
 import { getNumberWithCommas } from '@/utils'
 import { generateErrorReportInfo } from '@/utils/log/error-log'
 import { sendErrorLog } from '@/utils/log/send-log'
+import { normalizeError } from '@/utils/normalize-error'
 
 import {
   COUPON_DISCOUNT,
@@ -792,9 +793,7 @@ export default function PaperMagazineForm({ plan }: { plan: PlanId }) {
     } catch (error) {
       setIsProcessing(false)
       setSubmitError('結帳資料送出失敗，請稍後再試。')
-      const normalizedError =
-        error instanceof Error ? error : new Error(String(error))
-      sendErrorLog(generateErrorReportInfo(normalizedError))
+      sendErrorLog(generateErrorReportInfo(normalizeError(error)))
     }
   }
 

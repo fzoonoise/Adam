@@ -8,6 +8,7 @@ import { auth } from '@/firebase'
 import { getSearchParamFromApiKeyUrl, isValidPassword } from '@/utils'
 import { generateErrorReportInfo } from '@/utils/log/error-log'
 import { sendErrorLog } from '@/utils/log/send-log'
+import { normalizeError } from '@/utils/normalize-error'
 
 import { InputState } from '../authentication-form'
 
@@ -45,9 +46,7 @@ export default function BodyPasswordReset() {
       await confirmPasswordReset(auth, actionCode, password)
       void router.replace('/password-change-success')
     } catch (error) {
-      const normalizedError =
-        error instanceof Error ? error : new Error(String(error))
-      const errorReport = generateErrorReportInfo(normalizedError, {
+      const errorReport = generateErrorReportInfo(normalizeError(error), {
         userEmail: email.current,
       })
       sendErrorLog(errorReport)
@@ -73,9 +72,7 @@ export default function BodyPasswordReset() {
         email.current = await verifyPasswordResetCode(auth, actionCode)
         setIsInitialized(true)
       } catch (error) {
-        const normalizedError =
-          error instanceof Error ? error : new Error(String(error))
-        const errorReport = generateErrorReportInfo(normalizedError, {
+        const errorReport = generateErrorReportInfo(normalizeError(error), {
           userEmail: email.current,
         })
         sendErrorLog(errorReport)

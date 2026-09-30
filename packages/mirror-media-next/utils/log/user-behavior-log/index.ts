@@ -9,32 +9,25 @@ import {
   getDeviceInfo,
   getFormattedPageType,
   getWindowSizeInfo,
+  type LogContextPayload,
+  type LogPageInfo,
 } from '../shared'
 
-/**
- * @typedef {'pageview' | 'exit' | 'scroll-to-80%' | 'click'} EventType
- *
- * @typedef {import('../../../modules/membership/membership-types').MemberType} MemberType
- *
- * @typedef {Object} Payload
- * @property {MemberType} memberType - type of member
- * @property {string} userEmail - member email
- * @property {string} firebaseId - member firebase id
- * @property {boolean} isMemberArticle - whether is member article. It will only be `true` if it is on story page and is a member article.
- * @property {string} writers - story writer
- */
+type EventType = 'pageview' | 'exit' | 'scroll-to-80%' | 'click'
+
+type UserBehaviorLogPayload = LogContextPayload & {
+  writers?: string
+}
 
 /**
  * Generate information for user behavior log.
  * Caution: Since this function have use Web API, such as `window.location.href`, `window.navigator.userAgent`,
  * this function should be ONLY executed at client-side.
- * @param {EventType} eventType
- * @param {Payload} payload
  * @throws {Error}
  */
 const generateUserBehaviorLogInfo = (
-  eventType,
-  payload = {
+  eventType: EventType,
+  payload: UserBehaviorLogPayload = {
     memberType: 'not-member',
     userEmail: '',
     firebaseId: '',
@@ -48,7 +41,7 @@ const generateUserBehaviorLogInfo = (
 
   const {
     memberType = 'not-member',
-    userEmail = '',
+    userEmail,
     firebaseId = '',
     isMemberArticle = false,
     writers,
@@ -62,7 +55,7 @@ const generateUserBehaviorLogInfo = (
     ip: '',
     userInfo: {
       'member-type': memberType,
-      email: userEmail,
+      email: userEmail ?? '',
       'firebase-id': firebaseId,
     },
     browser: getBrowserInfo(userAgent),
@@ -70,14 +63,14 @@ const generateUserBehaviorLogInfo = (
     'is-in-app-browser': detectIsInApp(userAgent),
     'screen-size': getWindowSizeInfo(),
   }
-  const pageInfo = {
+  const pageInfo: LogPageInfo = {
     referral: document.referrer,
     'page-url': window.location.href,
     'page-type': getFormattedPageType(pathname, isMemberArticle),
   }
 
   if (pathname.startsWith('/story/')) {
-    pageInfo['story-slug'] = pathname.split('/story/')?.[1] ?? ''
+    pageInfo['story-slug'] = pathname.split('/story/')[1] ?? ''
     pageInfo['story-author'] = writers
   }
   return { triggerEvent, clientInfo, pageInfo }
