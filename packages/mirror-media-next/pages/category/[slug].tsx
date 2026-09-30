@@ -203,7 +203,7 @@ export const getServerSideProps = (async ({ query, req, res }) => {
       category = toCategorySummary(data.category) ?? category
     } catch (error) {
       logGqlError(
-        error instanceof Error ? error : new Error(String(error)),
+        error,
         `Error occurs while getting category data in category page (${categorySlug})`,
         globalLogFields
       )

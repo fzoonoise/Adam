@@ -459,7 +459,7 @@ export const getServerSideProps: GetServerSideProps<
     }
   } catch (err) {
     logGqlError(
-      err instanceof Error ? err : new Error(String(err)),
+      err,
       `Error occurs while getting data in story page (slug: ${slug})`,
       globalLogFields
     )

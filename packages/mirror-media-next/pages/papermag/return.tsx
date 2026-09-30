@@ -30,6 +30,7 @@ import {
 import { setPageCache } from '@/utils/cache-setting'
 import { getSectionAndTopicFromDefaultHeaderData } from '@/utils/data-process'
 import { getLogTraceObject, transformTimeData } from '@/utils/index'
+import { normalizeError } from '@/utils/normalize-error'
 import { processSettledResult } from '@/utils/response-processor'
 
 const REQUEST_BODY_LIMIT_BYTES = 1024 * 1024
@@ -241,8 +242,7 @@ export const getServerSideProps: GetServerSideProps<ReturnPageProps> = async ({
       },
     }
   } catch (error) {
-    const normalizedError =
-      error instanceof Error ? error : new Error(String(error))
+    const normalizedError = normalizeError(error)
     const annotatedError = errors.helpers.wrap(
       normalizedError,
       'UnhandledError',

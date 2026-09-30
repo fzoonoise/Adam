@@ -20,6 +20,7 @@ import {
   paperMagazineOrderInputSchema,
   PLAN_LIST,
 } from '../../modules/paper-magazine/paper-magazine-data'
+import { normalizeError } from '../../utils/normalize-error'
 
 type NewebpayTradeInfo = NonNullable<
   FetchPaymentDataOfPapermagMutation['createNewebpayTradeInfoForMagazineOrder']
@@ -135,12 +136,9 @@ export default async function EncryptInfo(
       data: encryptPostData,
     })
   } catch (e) {
-    const error = e instanceof Error ? e : new Error(String(e))
-    const helpers = errors.helpers as typeof errors.helpers & {
-      wrap: (error: unknown, name: string, message: string) => Error
-    }
-    const annotatingError = helpers.wrap(
-      error.message,
+    const error = normalizeError(e)
+    const annotatingError = errors.helpers.wrap(
+      error,
       'UnhandledError',
       'Error occurs while submit papermag'
     )

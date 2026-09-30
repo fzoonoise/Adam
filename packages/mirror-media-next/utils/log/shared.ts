@@ -1,9 +1,9 @@
 import { ApolloError } from '@apollo/client'
 import errors from '@twreporter/errors'
-import type { AxiosError } from 'axios'
 import Bowser from 'bowser'
 
 import { ENV } from '../../config/index.mjs'
+import { normalizeError } from '../normalize-error'
 
 type BrowserOrDeviceInfo = {
   name?: string
@@ -27,6 +27,21 @@ type PageType =
   | 'other'
 
 type TraceObject = Record<string, unknown>
+
+type LogContextPayload = {
+  memberType?: string
+  userEmail?: string | null
+  firebaseId?: string
+  isMemberArticle?: boolean
+}
+
+type LogPageInfo = {
+  referral: string
+  'page-url': string
+  'page-type': PageType
+  'story-slug'?: string
+  'story-author'?: string
+}
 
 function getBrowserInfo(userAgent = ''): BrowserOrDeviceInfo {
   if (!userAgent) {
@@ -112,12 +127,13 @@ function getFormattedPageType(
 }
 
 function logAxiosError(
-  axiosErrors: Error | AxiosError,
+  axiosErrors: unknown,
   errorMessage: string,
   traceObject?: TraceObject
 ): void {
+  const normalizedError = normalizeError(axiosErrors)
   const annotatingError = errors.helpers.wrap(
-    axiosErrors,
+    normalizedError,
     'UnhandledError',
     errorMessage
   )
@@ -158,7 +174,7 @@ function logAxiosError(
 }
 
 function logGqlError(
-  gqlErrors: Error | ApolloError,
+  gqlErrors: unknown,
   errorMessage: string,
   traceObject?: TraceObject
 ): void {
@@ -218,8 +234,9 @@ function logGenericError(
   errorMessage: string,
   traceObject?: TraceObject
 ): void {
+  const normalizedError = normalizeError(genericError)
   const annotatingError = errors.helpers.wrap(
-    genericError as Error,
+    normalizedError,
     'UnhandledError',
     errorMessage
   )
@@ -261,4 +278,11 @@ export {
   logGenericError,
   logGqlError,
 }
-export type { BrowserOrDeviceInfo, PageType, TraceObject, WindowSizeInfo }
+export type {
+  BrowserOrDeviceInfo,
+  LogContextPayload,
+  LogPageInfo,
+  PageType,
+  TraceObject,
+  WindowSizeInfo,
+}
