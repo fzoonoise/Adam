@@ -12,15 +12,39 @@ import { normalizeError } from '@/utils/normalize-error'
 import { FormState, type LoginFormState } from './authentication-state'
 
 type AccessToken = Membership['accessToken']
+
+const IsrafelErrorCode = {
+  MemberNotFound: 'israfel/member-not-found',
+  EmailAlreadyUsed: 'israfel/email-already-used',
+} as const
+
+type IsrafelErrorCode = (typeof IsrafelErrorCode)[keyof typeof IsrafelErrorCode]
+
+// Follows the FirebaseError `code` convention used by the same login flow.
+// Consumers branch on `code`; the error keeps a plain `Error` name and the
+// existing log message.
+const createIsrafelError = (
+  code: IsrafelErrorCode,
+  message: string,
+  options?: ErrorOptions
+) => Object.assign(new Error(message, options), { code })
+
+const hasIsrafelErrorCode = (error: unknown, code: IsrafelErrorCode) =>
+  error instanceof Error && 'code' in error && error.code === code
+
 /**
  * there are 3 error situation:
  * 1: has firebase auth, but no member data in Israfel(login)
  * 2: has created new firebase auth, but member email is duplicated (regiser)
  * 3: some server error
- * in situation 1 and 2:
+ * in situation 2:
  * we need to delete this member's firebase account
- * in situation3:
+ * in situation 1 and 3:
  * do nothing with the firebase auth object
+ *
+ * Situation 1 deliberately keeps the Firebase account. The Firebase project is
+ * shared with the Nuxt app, and deleting the account cannot be undone, so
+ * enabling deletion for a missing Israfel member needs a separate decision.
  */
 const errorHandler = async (
   error: Error,
@@ -31,10 +55,7 @@ const errorHandler = async (
     import('firebase/auth'),
   ])
   const currentUser = auth.currentUser
-  if (
-    error.message === "GraphQL error: Can't find data in Israfel" ||
-    error.message === "this member's email has been used in Israfel"
-  ) {
+  if (hasIsrafelErrorCode(error, IsrafelErrorCode.EmailAlreadyUsed)) {
     currentUser?.delete()
   }
 
@@ -78,14 +99,17 @@ const createMemberDataInIsrafel = async (
     })
   } catch (error) {
     const normalizedError = normalizeError(error)
-    const errorMessage =
-      normalizedError.message.search(
-        'Unique constraint failed on the fields'
-      ) !== -1
-        ? "this member's email has been used in Israfel"
-        : normalizedError.message
+    if (
+      normalizedError.message.includes('Unique constraint failed on the fields')
+    ) {
+      throw createIsrafelError(
+        IsrafelErrorCode.EmailAlreadyUsed,
+        "this member's email has been used in Israfel",
+        { cause: normalizedError }
+      )
+    }
 
-    throw new Error(errorMessage)
+    throw new Error(normalizedError.message)
   }
 }
 /**
@@ -110,9 +134,13 @@ const fetchBasicMemberInfoInIsrafel = async (
     })
     const memberData = result?.data?.member
     if (!memberData) {
-      throw "GraphQL error: Can't find data in Israfel, please check if this member's data existed in Israfel"
+      throw createIsrafelError(
+        IsrafelErrorCode.MemberNotFound,
+        "GraphQL error: Can't find data in Israfel, please check if this member's data existed in Israfel"
+      )
     }
   } catch (error) {
+    if (hasIsrafelErrorCode(error, IsrafelErrorCode.MemberNotFound)) throw error
     throw new Error(String(error))
   }
 }
