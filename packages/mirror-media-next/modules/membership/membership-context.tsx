@@ -119,8 +119,8 @@ const MembershipProvider = ({
         return idToken
       } catch (err) {
         const errorLog = generateErrorReportInfo(err as Error, {
-          userEmail: membership.userEmail,
-          firebaseId: membership.firebaseId,
+          userEmail: user.email,
+          firebaseId: user.uid,
         })
         sendErrorLog(errorLog)
 
@@ -128,13 +128,13 @@ const MembershipProvider = ({
       }
     }
 
-    const getMemberType = (accessToken: string): MemberType => {
+    const getMemberType = (accessToken: string, user: User): MemberType => {
       try {
         return getMemberTypeFromAccessToken(accessToken)
       } catch (e) {
         const errorLog = generateErrorReportInfo(e as Error, {
-          userEmail: membership.userEmail,
-          firebaseId: membership.firebaseId,
+          userEmail: user.email,
+          firebaseId: user.uid,
         })
         sendErrorLog(errorLog)
 
@@ -165,7 +165,7 @@ const MembershipProvider = ({
          */
         try {
           const accessToken = await getAccessToken(idToken)
-          const memberType = getMemberType(accessToken)
+          const memberType = getMemberType(accessToken, user)
 
           if (accessToken) {
             dispatch({
