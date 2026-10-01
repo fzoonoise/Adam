@@ -4,14 +4,14 @@ import CenteredHint from './centered-input-hint'
 import Hint from './input-hint'
 
 const DEFAULT = 'default'
-const NOT_REGISRATED = 'not-registrated'
+const NOT_REGISTERED = 'not-registered'
 const ERROR = 'error'
 const IN_PROGRESS = 'in-progress'
 const SUCCESS = 'success'
 
 export const HINT_STATE = {
   DEFAULT,
-  NOT_REGISRATED,
+  NOT_REGISTERED,
   ERROR,
   IN_PROGRESS,
   SUCCESS,
@@ -34,7 +34,7 @@ export default function Hints({ state }: HintsProps) {
           正在寄出信件...
         </Hint>
       )
-    case NOT_REGISRATED:
+    case NOT_REGISTERED:
       return (
         <Hint
           state={InputState.Invalid}

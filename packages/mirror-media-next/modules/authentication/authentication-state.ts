@@ -36,7 +36,7 @@ type LoginState = {
   state: LoginFormState
   loginFormMode: LoginFormMode
   prevAuthMethod: string
-  shouldShowHintOfExitenceOfDifferentAuthMethod: boolean
+  shouldShowHintOfExistenceOfDifferentAuthMethod: boolean
   email: string
   password: string
   isFederatedRedirectResultLoading: boolean
@@ -46,7 +46,7 @@ const initialState: LoginState = {
   state: FormState.Form,
   loginFormMode: FormMode.Start,
   prevAuthMethod: AuthMethod.Default,
-  shouldShowHintOfExitenceOfDifferentAuthMethod: false,
+  shouldShowHintOfExistenceOfDifferentAuthMethod: false,
   email: '',
   password: '',
   isFederatedRedirectResultLoading: true,
@@ -74,11 +74,11 @@ const loginSlice = createSlice({
     changePrevAuthMethod: (state, action: PayloadAction<string>) => {
       state.prevAuthMethod = action.payload
     },
-    changeShouldShowHintOfExitenceOfDifferentAuthMethod: (
+    changeShouldShowHintOfExistenceOfDifferentAuthMethod: (
       state,
       action: PayloadAction<boolean>
     ) => {
-      state.shouldShowHintOfExitenceOfDifferentAuthMethod = action.payload
+      state.shouldShowHintOfExistenceOfDifferentAuthMethod = action.payload
     },
     changeIsFederatedRedirectResultLoading: (
       state,
@@ -89,7 +89,7 @@ const loginSlice = createSlice({
     resetLoginState: (state) => {
       state.state = FormState.Form
       state.prevAuthMethod = AuthMethod.Default
-      state.shouldShowHintOfExitenceOfDifferentAuthMethod = false
+      state.shouldShowHintOfExistenceOfDifferentAuthMethod = false
       state.email = ''
       state.password = ''
       state.loginFormMode = FormMode.Start
@@ -98,7 +98,7 @@ const loginSlice = createSlice({
       state.state = FormState.Form
       state.loginFormMode = FormMode.Start
       state.password = ''
-      state.shouldShowHintOfExitenceOfDifferentAuthMethod = false
+      state.shouldShowHintOfExistenceOfDifferentAuthMethod = false
     },
     goToLoginForm: (state) => {
       state.state = FormState.Form
@@ -111,23 +111,23 @@ const loginSlice = createSlice({
     },
     setSignInWithGoogle: (state) => {
       state.prevAuthMethod = AuthMethod.Google
-      state.shouldShowHintOfExitenceOfDifferentAuthMethod = true
+      state.shouldShowHintOfExistenceOfDifferentAuthMethod = true
     },
     setSignInWithFacebook: (state) => {
       state.prevAuthMethod = AuthMethod.Facebook
-      state.shouldShowHintOfExitenceOfDifferentAuthMethod = true
+      state.shouldShowHintOfExistenceOfDifferentAuthMethod = true
     },
     setSignInWithApple: (state) => {
       state.prevAuthMethod = AuthMethod.Apple
-      state.shouldShowHintOfExitenceOfDifferentAuthMethod = true
+      state.shouldShowHintOfExistenceOfDifferentAuthMethod = true
     },
   },
 })
 
 const loginState = (state: AppState) => state.login.state
 const loginPrevAuthMethod = (state: AppState) => state.login.prevAuthMethod
-const loginShouldShowHintOfExitenceOfDifferentAuthMethod = (state: AppState) =>
-  state.login.shouldShowHintOfExitenceOfDifferentAuthMethod
+const loginShouldShowHintOfExistenceOfDifferentAuthMethod = (state: AppState) =>
+  state.login.shouldShowHintOfExistenceOfDifferentAuthMethod
 const loginEmail = (state: AppState) => state.login.email
 const loginPassword = (state: AppState) => state.login.password
 const loginFormMode = (state: AppState) => state.login.loginFormMode
@@ -143,7 +143,7 @@ export {
   loginIsFederatedRedirectResultLoading,
   loginPassword,
   loginPrevAuthMethod,
-  loginShouldShowHintOfExitenceOfDifferentAuthMethod,
+  loginShouldShowHintOfExistenceOfDifferentAuthMethod,
   loginState,
 }
 export type {

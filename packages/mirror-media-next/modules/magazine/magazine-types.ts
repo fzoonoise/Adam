@@ -1,14 +1,14 @@
 import type {
   FetchSpecialsQuery,
-  FetchWeeklysQuery,
+  FetchWeekliesQuery,
 } from '@/apollo/__generated__/content/graphql'
 
 type SpecialMagazine = NonNullable<FetchSpecialsQuery['magazines']>[number]
-type WeeklyMagazine = NonNullable<FetchWeeklysQuery['magazines']>[number]
+type WeeklyMagazine = NonNullable<FetchWeekliesQuery['magazines']>[number]
 
 type MagazineCollections = {
   specials: SpecialMagazine[]
-  weeklys: WeeklyMagazine[]
+  weeklies: WeeklyMagazine[]
 }
 
 export type { MagazineCollections, SpecialMagazine, WeeklyMagazine }

@@ -101,10 +101,10 @@ function IssueCard({
   )
 }
 
-function MagazineWeeklys({ weeklys }: { weeklys: WeeklyMagazine[] }) {
+function MagazineWeeklies({ weeklies }: { weeklies: WeeklyMagazine[] }) {
   return (
     <ul className="mx-auto mt-8 grid w-70 grid-cols-2 justify-items-center gap-x-4 gap-y-12 md:w-168 md:grid-cols-4 md:gap-x-8 xl:mt-12 xl:w-276 xl:grid-cols-6 xl:gap-x-12 xl:gap-y-15">
-      {weeklys.map((magazine) => (
+      {weeklies.map((magazine) => (
         <IssueCard key={magazine.id} magazine={magazine} type="weekly" />
       ))}
     </ul>
@@ -121,4 +121,4 @@ function MagazineSpecials({ specials }: { specials: SpecialMagazine[] }) {
   )
 }
 
-export { MagazineSpecials, MagazineWeeklys }
+export { MagazineSpecials, MagazineWeeklies }

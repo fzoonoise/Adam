@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 import countryOptions from 'constants/lib/countries.json'
-import taiwanDisTrictOptions from 'constants/lib/taiwan-districts.json'
+import taiwanDistrictOptions from 'constants/lib/taiwan-districts.json'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
@@ -151,7 +151,7 @@ export default function UserProfileForm({
   }, [firebaseId, accessToken, memberType, userEmail, router])
 
   const cityNames = useMemo(() => {
-    return taiwanDisTrictOptions.map((data) => {
+    return taiwanDistrictOptions.map((data) => {
       return { key: data.name, label: data.name }
     })
   }, [])
@@ -171,7 +171,7 @@ export default function UserProfileForm({
 
   const handleCitySelect = (city: string) => {
     setUserCity(city)
-    const cityData = taiwanDisTrictOptions.find(function (el) {
+    const cityData = taiwanDistrictOptions.find(function (el) {
       return el.name === city
     })
     if (cityData) {

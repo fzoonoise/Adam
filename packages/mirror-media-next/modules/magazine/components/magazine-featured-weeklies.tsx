@@ -11,13 +11,13 @@ import {
 } from '../magazine-data'
 import type { WeeklyMagazine } from '../magazine-types'
 
-type MagazineFeaturedWeeklysProps = {
+type MagazineFeaturedWeekliesProps = {
   features: WeeklyMagazine[]
 }
 
-export default function MagazineFeaturedWeeklys({
+export default function MagazineFeaturedWeeklies({
   features,
-}: MagazineFeaturedWeeklysProps) {
+}: MagazineFeaturedWeekliesProps) {
   return (
     <ul className="mx-auto mt-8 grid w-70 grid-cols-1 justify-items-center gap-5 md:w-168 xl:mt-12 xl:w-276 xl:grid-cols-2">
       {features.map((magazine) => (

@@ -91,7 +91,7 @@ export default function LoginPageContent({ isWebview }: LoginPageContentProps) {
             )
           )
           dispatch(
-            loginActions.changeShouldShowHintOfExitenceOfDifferentAuthMethod(
+            loginActions.changeShouldShowHintOfExistenceOfDifferentAuthMethod(
               true
             )
           )

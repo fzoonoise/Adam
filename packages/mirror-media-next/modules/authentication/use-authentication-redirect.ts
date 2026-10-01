@@ -15,7 +15,7 @@ export default function useRedirect() {
       window.location.origin
     )
 
-    // TODO: there are some prviledged pages under construction,
+    // TODO: there are some privileged pages under construction,
     // so we can't use router.replace
     window.location.replace(destination)
   }, [router])

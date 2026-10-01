@@ -13,7 +13,7 @@ type UseMembershipRequiredOptions = {
 }
 
 /**
- * Client-side authenication handle.
+ * Client-side authentication handle.
  * It is useful when membership state changed but page didn't reloaded.
  */
 export default function useMembershipRequired(

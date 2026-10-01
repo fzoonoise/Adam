@@ -3,7 +3,7 @@ import type { ParsedUrlQuery } from 'querystring'
 import { z } from 'zod'
 
 import client from '@/apollo/apollo-client'
-import { fetchWeeklys } from '@/apollo/query/magazines'
+import { fetchWeeklies } from '@/apollo/query/magazines'
 import Layout from '@/components/shared/layout'
 import MagazineViewer from '@/modules/magazine/components/magazine-viewer'
 import type { WeeklyMagazine } from '@/modules/magazine/magazine-types'
@@ -28,14 +28,14 @@ type MagazineViewerPageProps = Record<string, unknown> & {
   book: string
   headerData: ShellHeaderData
   issue: string
-  weeklys: WeeklyMagazine[]
+  weeklies: WeeklyMagazine[]
 }
 
 export default function MagazineViewerPage({
   book,
   headerData,
   issue,
-  weeklys,
+  weeklies,
 }: MagazineViewerPageProps) {
   return (
     <Layout
@@ -43,7 +43,7 @@ export default function MagazineViewerPage({
       header={{ type: 'default', data: headerData }}
       withFooter={false}
     >
-      <MagazineViewer book={book} issue={issue} weeklys={weeklys} />
+      <MagazineViewer book={book} issue={issue} weeklies={weeklies} />
     </Layout>
   )
 }
@@ -69,7 +69,7 @@ export const getServerSideProps: GetServerSideProps<
   }
   const responses = await Promise.allSettled([
     fetchShellHeaderData({ logFields: globalLogFields }),
-    client.query({ query: fetchWeeklys }),
+    client.query({ query: fetchWeeklies }),
   ])
 
   const headerData = processSettledResult(
@@ -85,7 +85,7 @@ export const getServerSideProps: GetServerSideProps<
     globalLogFields
   )
 
-  const weeklys = processSettledResult(
+  const weeklies = processSettledResult(
     responses[1],
     (result): WeeklyMagazine[] => result?.data.magazines ?? [],
     `Error occurs while getting data in magazine page (issue: ${issue})`,
@@ -97,7 +97,7 @@ export const getServerSideProps: GetServerSideProps<
       book,
       headerData,
       issue,
-      weeklys,
+      weeklies,
     },
   }
 })

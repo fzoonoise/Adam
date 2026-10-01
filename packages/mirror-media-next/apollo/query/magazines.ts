@@ -11,8 +11,8 @@ const fetchSpecials = graphql(`
   }
 `)
 
-const fetchWeeklys = graphql(`
-  query fetchWeeklys {
+const fetchWeeklies = graphql(`
+  query fetchWeeklies {
     magazines(
       where: { type: { equals: "weekly" }, state: { equals: "published" } }
       orderBy: { createdAt: desc }
@@ -23,4 +23,4 @@ const fetchWeeklys = graphql(`
   }
 `)
 
-export { fetchSpecials, fetchWeeklys }
+export { fetchSpecials, fetchWeeklies }

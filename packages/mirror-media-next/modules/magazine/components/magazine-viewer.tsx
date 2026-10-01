@@ -7,24 +7,24 @@ import type { WeeklyMagazine } from '../magazine-types'
 type MagazineViewerProps = {
   book: string
   issue: string
-  weeklys: WeeklyMagazine[]
+  weeklies: WeeklyMagazine[]
 }
 
 export default function MagazineViewer({
   book,
   issue,
-  weeklys,
+  weeklies,
 }: MagazineViewerProps) {
   const router = useRouter()
   const iframeSrc = `https://storage.googleapis.com/mm-magazine/${book}/${issue}/index.html`
 
   useEffect(() => {
-    const validSources = getValidMagazineSources(weeklys)
+    const validSources = getValidMagazineSources(weeklies)
 
     if (!validSources.includes(iframeSrc)) {
       void router.push('/404')
     }
-  }, [iframeSrc, router, weeklys])
+  }, [iframeSrc, router, weeklies])
 
   return (
     <iframe

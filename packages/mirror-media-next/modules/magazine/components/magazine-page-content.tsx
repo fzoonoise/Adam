@@ -9,8 +9,8 @@ import { fetchMagazineCollections, sortWeeklyMagazines } from '../magazine-data'
 import type { SpecialMagazine, WeeklyMagazine } from '../magazine-types'
 
 import JoinPremiumMember from './join-premium-member'
-import MagazineFeaturedWeeklys from './magazine-featured-weeklys'
-import { MagazineSpecials, MagazineWeeklys } from './magazine-issue-list'
+import MagazineFeaturedWeeklies from './magazine-featured-weeklies'
+import { MagazineSpecials, MagazineWeeklies } from './magazine-issue-list'
 import MagazinePlatforms from './magazine-platforms'
 
 function MagazineSection({
@@ -37,7 +37,7 @@ function MagazineSection({
 export default function MagazinePageContent() {
   useMembershipRequired()
   const [specials, setSpecials] = useState<SpecialMagazine[]>([])
-  const [weeklys, setWeeklys] = useState<WeeklyMagazine[]>([])
+  const [weeklies, setWeeklies] = useState<WeeklyMagazine[]>([])
   const { memberInfo } = useMembership()
   const { memberType } = memberInfo
 
@@ -53,7 +53,7 @@ export default function MagazinePageContent() {
       try {
         const collections = await fetchMagazineCollections()
         setSpecials(collections.specials)
-        setWeeklys(collections.weeklys)
+        setWeeklies(collections.weeklies)
       } catch (error) {
         console.error(error)
       }
@@ -66,11 +66,11 @@ export default function MagazinePageContent() {
     return <JoinPremiumMember />
   }
 
-  const sortedMagazines = sortWeeklyMagazines(weeklys)
+  const sortedMagazines = sortWeeklyMagazines(weeklies)
 
   return (
     <main className="min-h-[65vh] bg-white xl:-mb-8">
-      {weeklys.length > 0 && (
+      {weeklies.length > 0 && (
         <>
           <MagazineSection
             title={
@@ -79,7 +79,7 @@ export default function MagazinePageContent() {
               </>
             }
           >
-            <MagazineFeaturedWeeklys features={sortedMagazines.slice(0, 2)} />
+            <MagazineFeaturedWeeklies features={sortedMagazines.slice(0, 2)} />
           </MagazineSection>
           <MagazineSection
             title={
@@ -88,7 +88,7 @@ export default function MagazinePageContent() {
               </>
             }
           >
-            <MagazineWeeklys weeklys={sortedMagazines.slice(2)} />
+            <MagazineWeeklies weeklies={sortedMagazines.slice(2)} />
           </MagazineSection>
         </>
       )}

@@ -78,7 +78,7 @@ export default function RecoverPasswordForm({
         error instanceof FirebaseError &&
         error.code === FirebaseAuthError.USER_NOT_FOUND
       ) {
-        setHintState(HINT_STATE.NOT_REGISRATED)
+        setHintState(HINT_STATE.NOT_REGISTERED)
       } else {
         setHintState(HINT_STATE.ERROR)
       }

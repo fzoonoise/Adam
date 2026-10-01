@@ -12,7 +12,7 @@ import {
   loginEmail,
   loginIsFederatedRedirectResultLoading,
   loginPrevAuthMethod,
-  loginShouldShowHintOfExitenceOfDifferentAuthMethod,
+  loginShouldShowHintOfExistenceOfDifferentAuthMethod,
   type ThirdPartyAuthMethod,
 } from '../authentication-state'
 
@@ -36,8 +36,8 @@ export default function MainFormStart() {
   const isFederatedRedirectResultLoading = useAppSelector(
     loginIsFederatedRedirectResultLoading
   )
-  const shouldShowHintOfExitenceOfDifferentAuthMethod = useAppSelector(
-    loginShouldShowHintOfExitenceOfDifferentAuthMethod
+  const shouldShowHintOfExistenceOfDifferentAuthMethod = useAppSelector(
+    loginShouldShowHintOfExistenceOfDifferentAuthMethod
   )
   const shouldShowHintOfCompanyEmail = isCompanyEmail(email)
   const allowToContinue =
@@ -79,7 +79,7 @@ export default function MainFormStart() {
             thirdPartyName={thirdPartyName}
           />
         ))}
-        {shouldShowHintOfExitenceOfDifferentAuthMethod && (
+        {shouldShowHintOfExistenceOfDifferentAuthMethod && (
           <CenteredHint state={InputState.Invalid}>
             由於您曾以 {prevAuthMethod} 帳號登入，請點擊上方「使用{' '}
             {prevAuthMethod} 帳號繼續」重試。

@@ -35,7 +35,7 @@ const hasIsrafelErrorCode = (error: unknown, code: IsrafelErrorCode) =>
 /**
  * there are 3 error situation:
  * 1: has firebase auth, but no member data in Israfel(login)
- * 2: has created new firebase auth, but member email is duplicated (regiser)
+ * 2: has created new firebase auth, but member email is duplicated (registration)
  * 3: some server error
  * in situation 2:
  * we need to delete this member's firebase account

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import client from '@/apollo/apollo-client'
-import { fetchSpecials, fetchWeeklys } from '@/apollo/query/magazines'
+import { fetchSpecials, fetchWeeklies } from '@/apollo/query/magazines'
 import { processSettledResult } from '@/utils/response-processor'
 
 import type {
@@ -45,8 +45,8 @@ function getMagazineHrefFromSlug(slug: unknown): string | null {
   return `/magazine/Book_${version}/${version}${issueNumber}-Publish`
 }
 
-function sortWeeklyMagazines(weeklys: WeeklyMagazine[]): WeeklyMagazine[] {
-  return weeklys.slice().sort((a, b) => {
+function sortWeeklyMagazines(weeklies: WeeklyMagazine[]): WeeklyMagazine[] {
+  return weeklies.slice().sort((a, b) => {
     const parsedA = parseMagazineSlug(a.slug)
     const parsedB = parseMagazineSlug(b.slug)
 
@@ -62,8 +62,8 @@ function sortWeeklyMagazines(weeklys: WeeklyMagazine[]): WeeklyMagazine[] {
   })
 }
 
-function getValidMagazineSources(weeklys: WeeklyMagazine[]): string[] {
-  return weeklys.flatMap((weekly) => {
+function getValidMagazineSources(weeklies: WeeklyMagazine[]): string[] {
+  return weeklies.flatMap((weekly) => {
     const href = getMagazineHrefFromSlug(weekly.slug)
     return href
       ? [
@@ -86,7 +86,7 @@ function normalizeMagazineImageSet(
 async function fetchMagazineCollections(): Promise<MagazineCollections> {
   const responses = await Promise.allSettled([
     client.query({ query: fetchSpecials }),
-    client.query({ query: fetchWeeklys }),
+    client.query({ query: fetchWeeklies }),
   ])
 
   const specials = processSettledResult(
@@ -94,13 +94,13 @@ async function fetchMagazineCollections(): Promise<MagazineCollections> {
     (result): SpecialMagazine[] => result?.data.magazines ?? [],
     'Error occurs while getting special magazine in magazine list page'
   )
-  const weeklys = processSettledResult(
+  const weeklies = processSettledResult(
     responses[1],
     (result): WeeklyMagazine[] => result?.data.magazines ?? [],
     'Error occurs while getting weekly magazine in magazine list page'
   )
 
-  return { specials, weeklys }
+  return { specials, weeklies }
 }
 
 export {
