@@ -44,6 +44,9 @@ export default function PasswordChangeFail({
       case FROM_TYPE.UPDATE_PASSWORD:
         void router.push({ pathname: FROM_TYPE.UPDATE_PASSWORD })
         break
+      default:
+        // Preserve the existing no-op for a missing or unrecognized source.
+        break
     }
   }
 

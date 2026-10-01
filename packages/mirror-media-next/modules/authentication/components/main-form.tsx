@@ -24,6 +24,10 @@ export default function MainForm() {
         return <MainFormRegistration />
       case FormMode.Login:
         return <MainFormLoginWithPassword />
+      default: {
+        const unhandledMode: never = formMode
+        throw new Error(`Unexpected login form mode: ${String(unhandledMode)}`)
+      }
     }
   }
 

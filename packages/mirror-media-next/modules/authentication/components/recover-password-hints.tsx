@@ -66,8 +66,14 @@ export default function Hints({ state }: HintsProps) {
           </CenteredHint>
         </>
       )
-    default:
+    case DEFAULT:
       return null
+    default: {
+      const unhandledState: never = state
+      throw new Error(
+        `Unexpected password recovery hint state: ${String(unhandledState)}`
+      )
+    }
   }
 }
 

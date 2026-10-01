@@ -129,5 +129,10 @@ export default function LoginPageContent({ isWebview }: LoginPageContentProps) {
       return <RegistrationFailed />
     case FormState.LoginFail:
       return <LoginFailed />
+    default: {
+      // Every login state must be handled above.
+      const unhandledState: never = loginFormState
+      throw new Error(`Unexpected login form state: ${String(unhandledState)}`)
+    }
   }
 }

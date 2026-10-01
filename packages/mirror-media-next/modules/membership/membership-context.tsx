@@ -73,7 +73,8 @@ const membershipReducer = (
       }
 
     default: {
-      throw Error('Unknown action: ' + action.type)
+      const unhandledAction: never = action.type
+      throw Error('Unknown action: ' + unhandledAction)
     }
   }
 }

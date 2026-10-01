@@ -40,6 +40,12 @@ const createProvider = (
       return new FacebookAuthProvider()
     case AuthMethod.Apple:
       return new OAuthProvider('apple.com')
+    default: {
+      const unhandledMethod: never = thirdPartyName
+      throw new Error(
+        `Unexpected third-party authentication method: ${String(unhandledMethod)}`
+      )
+    }
   }
 }
 
@@ -64,6 +70,12 @@ export default function ButtonLoginWithThirdParty({
         return IconFacebook
       case AuthMethod.Apple:
         return IconApple
+      default: {
+        const unhandledMethod: never = thirdPartyName
+        throw new Error(
+          `Unexpected third-party authentication icon: ${String(unhandledMethod)}`
+        )
+      }
     }
   }, [thirdPartyName])
 

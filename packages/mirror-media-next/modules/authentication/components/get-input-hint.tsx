@@ -34,5 +34,9 @@ export default function getHint(
       ) : null
     case InputState.Start:
       return null
+    default: {
+      const unhandledState: never = state
+      throw new Error(`Unexpected input state: ${String(unhandledState)}`)
+    }
   }
 }
