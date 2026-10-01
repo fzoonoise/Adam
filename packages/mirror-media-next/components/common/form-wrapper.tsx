@@ -22,6 +22,7 @@ export default function FormWrapper({
   return (
     <div
       className={cn(
+        // prevent content from exceeding the boundaries of header
         'w-full max-w-149 min-w-80 bg-white px-5 md:my-12 md:w-106 md:rounded-3xl md:border md:border-mm-neutral-200 md:px-10 md:shadow-lg',
         paddingByVariant[variant],
         className

@@ -18,6 +18,7 @@ export default function MagazineViewer({
   const router = useRouter()
   const iframeSrc = `https://storage.googleapis.com/mm-magazine/${book}/${issue}/index.html`
 
+  // Check if iframeSrc is valid, if not, redirect to /404 page
   useEffect(() => {
     const validSources = getValidMagazineSources(weeklies)
 

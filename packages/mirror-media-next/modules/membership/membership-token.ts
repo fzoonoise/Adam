@@ -35,6 +35,7 @@ type LegacyAccessTokenPayload = {
   roles: MemberType[]
 }
 
+/** Remove access token data from localStorage. */
 const removeAccessTokenFromStorage = (): void => {
   localStorage.removeItem(ACCESS_TOKEN_STORE_KEY)
 }

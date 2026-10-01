@@ -1,3 +1,5 @@
+// TODO: add handle-forbid-to-marketing middleware
+
 import type { GetServerSideProps } from 'next'
 
 import { cn } from '@/components/cn'

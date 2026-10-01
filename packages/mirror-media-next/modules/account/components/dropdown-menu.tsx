@@ -47,6 +47,7 @@ export default function DropdownMenu({
       <SelectTrigger id={triggerId} className="w-full">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
+      {/* limit the visible items */}
       <SelectContent
         align="start"
         alignItemWithTrigger={false}

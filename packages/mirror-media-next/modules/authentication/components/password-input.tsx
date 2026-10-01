@@ -11,13 +11,13 @@ import getHint from './get-input-hint'
 
 type GenericPasswordInputProps = {
   id?: string
-  value: string
-  state: InputStateEnum
-  placeholder: string
-  incompleteMessage?: string
-  invalidMessage?: string
-  validMessage?: string
-  onChange: ChangeEventHandler<HTMLInputElement>
+  value: string // 輸入值
+  state: InputStateEnum // 輸入狀態
+  placeholder: string // 輸入框佔位文字
+  incompleteMessage?: string // 輸入未完成的提示
+  invalidMessage?: string // 輸入錯誤的提示
+  validMessage?: string // 輸入正確的提示
+  onChange: ChangeEventHandler<HTMLInputElement> // 輸入值變動處理
 }
 
 export default function GenericPasswordInput({

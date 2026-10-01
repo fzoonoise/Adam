@@ -44,6 +44,7 @@ export default function MagazinePageContent() {
   const canViewPremiumContent =
     memberType.includes('premium') || memberType.includes('staff')
 
+  // Fetch magazine data only for premium members or staff.
   useEffect(() => {
     if (!canViewPremiumContent) {
       return

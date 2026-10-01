@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 
 type DefaultButtonProps = {
-  children: ReactNode
-  isLoading?: boolean
-  onClick: MouseEventHandler<HTMLButtonElement>
+  children: ReactNode // 按鈕顯示內容
+  isLoading?: boolean // 是否顯示載入效果
+  onClick: MouseEventHandler<HTMLButtonElement> // 按鈕點擊事件處理
 }
 
 export default function DefaultButton({

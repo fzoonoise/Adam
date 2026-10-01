@@ -3,15 +3,16 @@ import { cn } from '@/components/cn'
 const steps = ['方案選擇', '確認訂購', '訂單完成'] as const
 
 type CheckoutStepsProps = {
-  activeStep?: number
+  activeStep?: number // The active step index, from 1 to 3.
 }
 
+/** Displays the checkout steps with active steps highlighted. */
 export default function CheckoutSteps({ activeStep = 1 }: CheckoutStepsProps) {
   return (
     <ol className="flex justify-center" aria-label="訂購進度">
       {steps.map((label, index) => {
         const step = index + 1
-        const isActive = activeStep >= step
+        const isActive = activeStep >= step // Whether this step is active.
 
         return (
           <li

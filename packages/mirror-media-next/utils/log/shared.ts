@@ -29,10 +29,10 @@ type PageType =
 type TraceObject = Record<string, unknown>
 
 type LogContextPayload = {
-  memberType?: string
-  userEmail?: string | null
-  firebaseId?: string
-  isMemberArticle?: boolean
+  memberType?: string // Type of member.
+  userEmail?: string | null // Member email; Firebase may return null.
+  firebaseId?: string // Member Firebase ID.
+  isMemberArticle?: boolean // True only on a member-only story page.
 }
 
 type LogPageInfo = {

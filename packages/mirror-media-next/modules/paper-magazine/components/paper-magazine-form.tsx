@@ -177,7 +177,7 @@ function ContactFields({
           label="手機"
           name="cellphone"
           onChange={onChange}
-          pattern="09[0-9]{8}"
+          pattern="09[0-9]{8}" // Match "09" followed by exactly 8 more digits
           placeholder="0912345678"
           required
           type="text"
@@ -676,6 +676,7 @@ export default function PaperMagazineForm({ plan }: { plan: PlanId }) {
     useState<PaymentPayload>(emptyPaymentPayload)
   const [submitError, setSubmitError] = useState('')
 
+  // 為了確保資料先填入 form 中
   useEffect(() => {
     if (paymentPayload.MerchantID && merchantIdRef.current?.form) {
       merchantIdRef.current.form.submit()
@@ -721,6 +722,7 @@ export default function PaperMagazineForm({ plan }: { plan: PlanId }) {
     event.preventDefault()
     if (isProcessing) return
     setSubmitError('')
+    // Check form validity again: if invalid, redirect to return fail page
     if (!hasRequiredValues || !receiptOption || !receiptData) {
       void router.push('/papermag/return?order-fail=true')
       return

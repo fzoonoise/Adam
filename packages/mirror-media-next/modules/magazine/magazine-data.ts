@@ -58,6 +58,8 @@ function sortWeeklyMagazines(weeklies: WeeklyMagazine[]): WeeklyMagazine[] {
       return parsedB.issueNumber - parsedA.issueNumber
     }
 
+    // If issue number is the same, sort by version in ascending order
+    // If version is also the same, maintain the original order
     return parsedA.version.localeCompare(parsedB.version)
   })
 }

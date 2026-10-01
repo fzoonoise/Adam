@@ -35,6 +35,18 @@ import { processSettledResult } from '@/utils/response-processor'
 
 const REQUEST_BODY_LIMIT_BYTES = 1024 * 1024
 
+/**
+ * Reads and parses the raw POST body for this page's getServerSideProps.
+ *
+ * Added during the Next.js 14 upgrade: Next 14 removed the private
+ * `next/dist/server/api-utils/node` parseBody helper this page previously used.
+ * A page's getServerSideProps only receives a raw Node IncomingMessage and
+ * Next.js does not parse the body for pages (only for API routes), so we read
+ * the request stream ourselves. Enforces a 1mb limit, parses `application/json`
+ * and otherwise treats the body as a urlencoded form post (the NewebPay return),
+ * and rejects oversized / invalid bodies so the caller's try/catch renders the
+ * failure page instead of throwing an uncaught error in the stream callback.
+ */
 function parseRequestBody(req: IncomingMessage): Promise<unknown> {
   return new Promise((resolve, reject) => {
     let bodySize = 0
@@ -174,6 +186,7 @@ export const getServerSideProps: GetServerSideProps<ReturnPageProps> = async ({
   }
 
   try {
+    // 資料來源：https://github.com/vercel/next.js/discussions/14979
     const infoData = newebPayReturnSchema.parse(await parseRequestBody(req))
     if (
       infoData.Status !== 'SUCCESS' ||

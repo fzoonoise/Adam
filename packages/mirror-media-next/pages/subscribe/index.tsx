@@ -1,3 +1,5 @@
+// TODO: add handle-go-to-marketing middleware
+
 import type { GetServerSideProps } from 'next'
 
 import Layout from '@/components/shared/layout'

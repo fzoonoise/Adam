@@ -9,7 +9,7 @@ import { loginActions, loginEmail } from '../authentication-state'
 import GenericTextInput from './text-input'
 
 type EmailInputProps = {
-  shouldShowHint?: boolean
+  shouldShowHint?: boolean // 是否顯示輸入提示訊息
 }
 
 const getValidity = (email: string): InputStateEnum => {

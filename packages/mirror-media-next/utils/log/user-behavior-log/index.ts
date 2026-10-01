@@ -16,7 +16,7 @@ import {
 type EventType = 'pageview' | 'exit' | 'scroll-to-80%' | 'click'
 
 type UserBehaviorLogPayload = LogContextPayload & {
-  writers?: string
+  writers?: string // Story writer.
 }
 
 /**

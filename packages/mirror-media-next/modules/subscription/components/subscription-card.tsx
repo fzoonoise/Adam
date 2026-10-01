@@ -72,8 +72,8 @@ function PremiumSubscriptionCard({
   planTitle = 'Premium 會員',
   shouldHideMonthlyButton = false,
 }: {
-  planTitle?: string
-  shouldHideMonthlyButton?: boolean
+  planTitle?: string // The title of the subscription plan.
+  shouldHideMonthlyButton?: boolean // Whether to hide the monthly subscription button.
 }) {
   return (
     <Card className={cardClassName()}>

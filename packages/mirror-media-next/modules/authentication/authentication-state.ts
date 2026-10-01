@@ -33,13 +33,13 @@ type ThirdPartyAuthMethod =
   | typeof AuthMethod.Apple
 
 type LoginState = {
-  state: LoginFormState
-  loginFormMode: LoginFormMode
-  prevAuthMethod: string
-  shouldShowHintOfExistenceOfDifferentAuthMethod: boolean
-  email: string
-  password: string
-  isFederatedRedirectResultLoading: boolean
+  state: LoginFormState // 頁面狀態
+  loginFormMode: LoginFormMode // 頁面狀態為 Form 時，對話框的狀態
+  prevAuthMethod: string // 先前登入所使用的方法
+  shouldShowHintOfExistenceOfDifferentAuthMethod: boolean // 是否顯示已使用其他方式註冊的提示
+  email: string // 輸入的 E-mail
+  password: string // 輸入的密碼
+  isFederatedRedirectResultLoading: boolean // 第三方登入是否正在處理中
 }
 
 const initialState: LoginState = {
