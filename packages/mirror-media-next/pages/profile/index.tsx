@@ -21,14 +21,10 @@ import { getSectionAndTopicFromDefaultHeaderData } from '../../utils/data-proces
 import { processSettledResult } from '../../utils/response-processor'
 import redirectToLoginWhileUnauthed from '../../utils/server-side-only/redirect-to-login-while-unauthed'
 
-const FORM = 'form'
-const SUCCESS = 'success'
-const FAIL = 'fail'
-
-export const MODE = {
-  FORM,
-  SUCCESS,
-  FAIL,
+const MODE = {
+  FORM: 'form',
+  SUCCESS: 'success',
+  FAIL: 'fail',
 } as const
 
 type ProfileProps = Record<string, unknown> & {
@@ -79,7 +75,7 @@ export default function Profile({ headerData, signInProvider }: ProfileProps) {
         </main>
       )}
 
-      {savedStatus == MODE.SUCCESS && (
+      {savedStatus === MODE.SUCCESS && (
         <div className="grow bg-white md:bg-mm-neutral-100">
           <SaveSuccess onReset={resetStatus} />
         </div>
