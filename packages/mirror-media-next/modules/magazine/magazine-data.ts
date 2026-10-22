@@ -12,7 +12,8 @@ import type {
 
 type NullableImageSet = NonNullable<WeeklyMagazine['coverPhoto']>['resized']
 
-const magazineSlugSchema = z.string().regex(/^(\d+)期-(\w)本$/)
+const MAGAZINE_SLUG_PATTERN = /(\d+)期-(\w)本/
+const magazineSlugSchema = z.string().regex(MAGAZINE_SLUG_PATTERN)
 
 function parseMagazineSlug(slug: unknown) {
   const result = magazineSlugSchema.safeParse(slug)
@@ -21,7 +22,7 @@ function parseMagazineSlug(slug: unknown) {
     return null
   }
 
-  const match = result.data.match(/^(\d+)期-(\w)本$/)
+  const match = result.data.match(MAGAZINE_SLUG_PATTERN)
 
   if (!match) {
     return null
@@ -34,13 +35,16 @@ function parseMagazineSlug(slug: unknown) {
 }
 
 function getMagazineHrefFromSlug(slug: unknown): string | null {
-  const parsedSlug = parseMagazineSlug(slug)
-
-  if (!parsedSlug) {
+  if (typeof slug !== 'string' || !parseMagazineSlug(slug)) {
     return null
   }
 
-  const { issueNumber, version } = parsedSlug
+  // Preserve the legacy URL rule: first digit group, A suffix or B fallback.
+  const issueNumber = slug.match(/\d+/)?.[0]
+  if (!issueNumber) {
+    return null
+  }
+  const version = slug.endsWith('A本') ? 'A' : 'B'
 
   return `/magazine/Book_${version}/${version}${issueNumber}-Publish`
 }
