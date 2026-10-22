@@ -35,16 +35,27 @@ function parseMagazineSlug(slug: unknown) {
 }
 
 function getMagazineHrefFromSlug(slug: unknown): string | null {
-  if (typeof slug !== 'string' || !parseMagazineSlug(slug)) {
+  if (typeof slug !== 'string') {
     return null
   }
 
-  // Preserve the legacy URL rule: first digit group, A suffix or B fallback.
+  const parsedSlug = parseMagazineSlug(slug)
+  // TODO: Support C and other editions or slug formats once content publishing
+  // or the backend provides reader resources and explicit URL mappings.
+  // Preserve the restriction on original PDF downloads; do not fall back to B.
+  if (
+    !parsedSlug ||
+    (parsedSlug.version !== 'A' && parsedSlug.version !== 'B')
+  ) {
+    return null
+  }
+
+  // Preserve the original issue text, including leading zeros.
   const issueNumber = slug.match(/\d+/)?.[0]
   if (!issueNumber) {
     return null
   }
-  const version = slug.endsWith('A本') ? 'A' : 'B'
+  const version = parsedSlug.version
 
   return `/magazine/Book_${version}/${version}${issueNumber}-Publish`
 }
