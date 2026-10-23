@@ -794,27 +794,27 @@ export default function PaperMagazineForm({ plan }: { plan: PlanId }) {
     }
 
     const input: PaperMagazineOrderInput = {
-      buyerName: tripleValue?.抬頭 ?? '',
-      buyerUBN: tripleValue?.統一編號 ?? '',
-      carrierNum,
-      carrierType,
-      category: isTriple ? 'B2B' : 'B2C',
-      comment: '',
-      desc: selectedPlan.title,
-      itemCount: count,
-      loveCode: donateValue?.code ?? null,
-      merchandise: { connect: { code: selectedPlan.code } },
-      promoteCode: promoteCodeValue,
-      purchaseAddress: orderer.address,
-      purchaseDatetime: new Date().toISOString(),
-      purchaseEmail: orderer.email,
-      purchaseMobile: orderer.cellphone,
-      purchaseName: orderer.username,
-      purchasePhone: `${orderer.phone} ${orderer.phoneExt}`,
-      receiveAddress: effectiveRecipient.address,
-      receiveMobile: effectiveRecipient.cellphone,
-      receiveName: effectiveRecipient.username,
-      receivePhone: `${effectiveRecipient.phone} ${effectiveRecipient.phoneExt}`,
+      buyerName: tripleValue?.抬頭 ?? '', // 買受人名稱（三聯式發票）
+      buyerUBN: tripleValue?.統一編號 ?? '', // 買受人統一編號（三聯式發票）
+      carrierNum, // 載具編號（二聯式發票）
+      carrierType, // 載具類別
+      category: isTriple ? 'B2B' : 'B2C', // 發票種類
+      comment: '', // 約定事項
+      desc: selectedPlan.title, // 訂單描述
+      itemCount: count, // 商品數量
+      loveCode: donateValue?.code ?? null, // 捐贈碼
+      merchandise: { connect: { code: selectedPlan.code } }, // 商品名稱
+      promoteCode: promoteCodeValue, // 使用優惠碼
+      purchaseAddress: orderer.address, // 購買者地址
+      purchaseDatetime: new Date().toISOString(), // 訂購時間
+      purchaseEmail: orderer.email, // 購買者信箱
+      purchaseMobile: orderer.cellphone, // 購買者手機
+      purchaseName: orderer.username, // 購買者姓名
+      purchasePhone: `${orderer.phone} ${orderer.phoneExt}`, // 購買者電話
+      receiveAddress: effectiveRecipient.address, // 收件者地址
+      receiveMobile: effectiveRecipient.cellphone, // 收件者手機
+      receiveName: effectiveRecipient.username, // 收件者姓名
+      receivePhone: `${effectiveRecipient.phone} ${effectiveRecipient.phoneExt}`, // 收件者電話
     }
 
     const parsedInput = paperMagazineOrderInputSchema.safeParse(input)
