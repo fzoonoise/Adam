@@ -38,7 +38,7 @@ function ContactLink({ desktop = false }: { desktop?: boolean }) {
       className={cn(
         buttonVariants({ variant: 'outline' }),
         'rounded-mm-m no-underline shadow-md hover:no-underline',
-        desktop ? 'hidden legacy-xl:inline-flex' : 'legacy-xl:hidden'
+        desktop ? 'hidden xl:inline-flex' : 'xl:hidden'
       )}
       href={href}
       rel={desktop ? 'noreferrer noopener' : undefined}
@@ -51,9 +51,9 @@ function ContactLink({ desktop = false }: { desktop?: boolean }) {
 
 export default function PlanSelection() {
   return (
-    <section className="mx-auto flex w-full flex-col gap-3 px-5 py-6 legacy-xl:w-256 legacy-xl:px-0 legacy-xl:py-12">
-      <div className="flex flex-col gap-3 legacy-xl:flex-row legacy-xl:flex-wrap legacy-xl:gap-x-15 legacy-xl:gap-y-6">
-        <div className="legacy-xl:w-120 legacy-xl:shrink-0">
+    <section className="mx-auto flex w-full flex-col gap-3 px-5 py-6 xl:w-256 xl:px-0 xl:py-12">
+      <div className="flex flex-col gap-3 xl:flex-row xl:flex-wrap xl:gap-x-15 xl:gap-y-6">
+        <div className="xl:w-120 xl:shrink-0">
           <Image
             className="h-full w-full object-cover"
             src={PlanBannerImage}
@@ -61,12 +61,12 @@ export default function PlanSelection() {
             priority
           />
         </div>
-        <div className="flex flex-1 flex-col gap-3 legacy-xl:gap-6">
+        <div className="flex flex-1 flex-col gap-3 xl:gap-6">
           {plans.map((plan) => {
             const details = getPlanInfoByIdAndShouldFreight(plan.id, false)
             return (
               <Card
-                className="rounded-mm-xl border-mm-neutral-200 p-4 text-center shadow-lg legacy-xl:w-117"
+                className="rounded-mm-xl border-mm-neutral-200 p-4 text-center shadow-lg xl:w-117"
                 key={plan.id}
               >
                 <Typography
@@ -120,9 +120,9 @@ export default function PlanSelection() {
               </Card>
             )
           })}
-          <div className="flex flex-wrap items-center justify-center gap-3 rounded-mm-xl border border-mm-base-500 p-4 text-mm-base-500 legacy-xl:w-117 legacy-xl:justify-between legacy-xl:px-6">
+          <div className="flex flex-wrap items-center justify-center gap-3 rounded-mm-xl border border-mm-base-500 p-4 text-mm-base-500 xl:w-117 xl:justify-between xl:px-6">
             <Typography
-              className="w-full text-center font-medium text-mm-base-500 legacy-xl:w-auto"
+              className="w-full text-center font-medium text-mm-base-500 xl:w-auto"
               variant="body-l"
             >
               <span className="text-mm-error-600">樂齡、師生</span>訂閱優惠方案

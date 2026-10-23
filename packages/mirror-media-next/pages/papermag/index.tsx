@@ -47,7 +47,7 @@ export default function PaperMagazine({
             <section className="py-3 md:-mb-12 md:py-6">
               {announcements.map(({ id, title, description }) => (
                 <div
-                  className="mx-auto grid w-9/10 gap-2 rounded-mm-m bg-mm-error-100 p-4 legacy-xl:w-240"
+                  className="mx-auto grid w-9/10 gap-2 rounded-mm-m bg-mm-error-100 p-4 xl:w-240"
                   key={id}
                 >
                   <Typography

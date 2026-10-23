@@ -41,17 +41,17 @@ export default function MainForm() {
       <Image
         src={TabletBanner}
         alt="tablet banner"
-        className="hidden h-auto w-screen md:block legacy-xxl:hidden"
+        className="hidden h-auto w-screen md:block 2xl:hidden"
       />
       <Image
         src={DesktopBanner}
         alt="desktop banner"
-        className="hidden h-auto w-screen legacy-xxl:block"
+        className="hidden h-auto w-screen 2xl:block"
       />
-      <section className="mx-5 mt-12 max-w-149 font-mm-sans text-mm-neutral-700 md:w-152 md:max-w-none legacy-xxl:w-219">
+      <section className="mx-5 mt-12 max-w-149 font-mm-sans text-mm-neutral-700 md:w-152 md:max-w-none 2xl:w-219">
         <Typography
           as="h1"
-          className="mb-4 text-center leading-normal font-medium md:mb-5 legacy-xxl:mb-8"
+          className="mb-4 text-center leading-normal font-medium md:mb-5 2xl:mb-8"
           variant="h3"
         >
           歡迎加入鏡週刊會員訂閱服務
@@ -64,9 +64,7 @@ export default function MainForm() {
           現在，請立即加入，成為我們的會員，體驗有質量、無干擾的新聞閱讀。
         </Typography>
       </section>
-      <FormWrapper className="legacy-xxl:my-15">
-        {getFormContentByMode()}
-      </FormWrapper>
+      <FormWrapper className="2xl:my-15">{getFormContentByMode()}</FormWrapper>
     </main>
   )
 }

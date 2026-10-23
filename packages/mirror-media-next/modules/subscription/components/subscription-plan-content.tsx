@@ -13,7 +13,7 @@ import SubscriptionNotice from './subscription-notice'
 function PlansSection({ viewerKind }: { viewerKind: SubscriptionViewerKind }) {
   if (viewerKind === 'yearlyMember') {
     return (
-      <section className="flex min-h-[70vh] flex-col items-center gap-10 px-5 py-10 md:bg-mm-neutral-100 md:p-12 legacy-xl:gap-12">
+      <section className="flex min-h-[70vh] flex-col items-center gap-10 px-5 py-10 md:bg-mm-neutral-100 md:p-12 xl:gap-12">
         <Card className="m-auto border-0 p-0 md:w-117 md:border md:border-mm-neutral-200 md:p-10 md:shadow-lg">
           <Typography as="h2" className="mb-3 font-medium" variant="h3">
             想要變更方案嗎？
@@ -36,8 +36,8 @@ function PlansSection({ viewerKind }: { viewerKind: SubscriptionViewerKind }) {
 
   return (
     <>
-      <section className="bg-mm-neutral-100 px-5 pt-6 pb-12 md:p-12 legacy-xl:px-30 legacy-xl:py-15">
-        <div className="mx-auto flex flex-col items-center gap-6 md:gap-8 legacy-xl:w-240">
+      <section className="bg-mm-neutral-100 px-5 pt-6 pb-12 md:p-12 xl:px-30 xl:py-15">
+        <div className="mx-auto flex flex-col items-center gap-6 md:gap-8 xl:w-240">
           {!isMonthlyMember && (
             <Typography as="h2" className="w-full font-medium" variant="h3">
               方案選擇

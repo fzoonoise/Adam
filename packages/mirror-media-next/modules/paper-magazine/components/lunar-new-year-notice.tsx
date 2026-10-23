@@ -3,8 +3,8 @@ import { Typography } from '@/components/ui/typography'
 // Keep this seasonal component and refresh its dates before each Lunar New Year.
 export default function LunarNewYearNotice() {
   return (
-    <section className="w-full p-3 legacy-xl:flex legacy-xl:justify-center legacy-xl:pt-6 legacy-xl:pb-0">
-      <div className="w-full rounded-mm-m bg-mm-error-100 p-4 legacy-xl:w-256">
+    <section className="w-full p-3 xl:flex xl:justify-center xl:pt-6 xl:pb-0">
+      <div className="w-full rounded-mm-m bg-mm-error-100 p-4 xl:w-256">
         <Typography
           as="h2"
           className="mb-2 font-medium text-mm-error-500"

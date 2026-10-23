@@ -209,7 +209,7 @@ export default function UserProfileForm({
   }
 
   return (
-    <form className="flex flex-col gap-y-10 legacy-xl:rounded-mm-xs legacy-xl:border legacy-xl:border-mm-neutral-200 legacy-xl:p-10">
+    <form className="flex flex-col gap-y-10 xl:rounded-mm-xs xl:border xl:border-mm-neutral-200 xl:p-10">
       <div className="break-words">
         <Typography as="h2" className={largeLabelClassName} variant="h5">
           Email

@@ -10,7 +10,7 @@ const notices = [
 
 export default function PaperMagazineNotice() {
   return (
-    <section className="mx-auto my-6 min-h-25 w-9/10 bg-white leading-normal md:my-12 md:w-17/20 legacy-xl:w-240">
+    <section className="mx-auto my-6 min-h-25 w-9/10 bg-white leading-normal md:my-12 md:w-17/20 xl:w-240">
       <Typography
         as="h2"
         className="mb-3 font-medium text-mm-neutral-500"

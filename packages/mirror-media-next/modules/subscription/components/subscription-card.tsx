@@ -48,7 +48,7 @@ function RibbonBadge() {
 }
 
 function cardClassName() {
-  return 'relative flex h-full w-full flex-col rounded-mm-xl border-mm-neutral-200 p-4 shadow-lg legacy-xl:w-117 legacy-xl:p-6'
+  return 'relative flex h-full w-full flex-col rounded-mm-xl border-mm-neutral-200 p-4 shadow-lg xl:w-117 xl:p-6'
 }
 
 function BasicSubscriptionCard() {

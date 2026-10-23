@@ -59,7 +59,7 @@ export default function Profile({ headerData, signInProvider }: ProfileProps) {
       }}
     >
       {savedStatus === MODE.FORM && (
-        <main className="mx-auto w-full max-w-149 overflow-x-hidden px-5 py-10 md:w-150 md:max-w-none md:overflow-x-visible md:px-0 md:py-15 legacy-xl:w-170">
+        <main className="mx-auto w-full max-w-149 overflow-x-hidden px-5 py-10 md:w-150 md:max-w-none md:overflow-x-visible md:px-0 md:py-15 xl:w-170">
           <Typography
             as="h1"
             className="mb-6 leading-9 font-medium md:mb-3"

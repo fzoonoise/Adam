@@ -6,7 +6,7 @@ import { SUBSCRIPTION_NOTICES } from '../subscription-data'
 
 export default function SubscriptionNotice() {
   return (
-    <section className="mx-5 my-6 min-h-25 bg-white leading-normal md:m-12 legacy-xl:mx-auto legacy-xl:w-240">
+    <section className="mx-5 my-6 min-h-25 bg-white leading-normal md:m-12 xl:mx-auto xl:w-240">
       <Typography
         as="h2"
         className="mb-3 font-medium text-mm-neutral-500"

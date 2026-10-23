@@ -38,7 +38,7 @@ export default function Marketing({
         data: { flashNewsData, sectionsData, topicsData },
       }}
     >
-      <main className="min-h-[70vh] px-5 py-10 md:bg-mm-neutral-100 md:p-12 legacy-xl:-mb-8">
+      <main className="min-h-[70vh] px-5 py-10 md:bg-mm-neutral-100 md:p-12 xl:-mb-8">
         <Card className="m-auto border-0 p-0 md:w-117 md:border md:border-mm-neutral-200 md:p-10 md:shadow-lg">
           <Typography as="h1" className="mb-3 font-medium" variant="h3">
             此頁面為個人會員訂閱頁面

@@ -24,7 +24,7 @@ export default function SubscriptionPageContent() {
   const router = useRouter()
 
   return (
-    <main className="min-h-[70vh] legacy-xl:-mb-8">
+    <main className="min-h-[70vh] xl:-mb-8">
       {viewerKind !== 'yearlyMember' && <CheckoutSteps activeStep={1} />}
       <SubscriptionPlanContent viewerKind={viewerKind} />
       <div className="flex flex-wrap justify-center gap-1 bg-mm-base-100 p-1">
