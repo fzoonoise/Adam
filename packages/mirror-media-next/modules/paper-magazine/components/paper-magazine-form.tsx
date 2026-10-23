@@ -722,7 +722,9 @@ export default function PaperMagazineForm({ plan }: { plan: PlanId }) {
         return receiptData.value.length > 0
       default: {
         const unhandledReceipt: never = receiptData
-        throw new Error(`Unexpected receipt data: ${String(unhandledReceipt)}`)
+        throw new Error(
+          `Unexpected receipt data: ${JSON.stringify(unhandledReceipt)}`
+        )
       }
     }
   })()
@@ -785,7 +787,7 @@ export default function PaperMagazineForm({ plan }: { plan: PlanId }) {
         default: {
           const unhandledReceipt: never = receiptData
           throw new Error(
-            `Unexpected receipt data: ${String(unhandledReceipt)}`
+            `Unexpected receipt data: ${JSON.stringify(unhandledReceipt)}`
           )
         }
       }

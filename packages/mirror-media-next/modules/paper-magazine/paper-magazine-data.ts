@@ -146,20 +146,6 @@ function getMerchandiseAndShippingFeeInfo(merchandiseCode: string) {
   return PLAN_LIST.find((plan) => plan.code === merchandiseCode)
 }
 
-function hasCompleteContact(
-  contact: Pick<
-    PaperMagazineOrderInput,
-    'purchaseName' | 'purchaseMobile' | 'purchaseAddress' | 'purchaseEmail'
-  >
-): boolean {
-  return Boolean(
-    contact.purchaseName &&
-    contact.purchaseMobile &&
-    contact.purchaseAddress &&
-    contact.purchaseEmail
-  )
-}
-
 async function createPaperMagazinePayment(input: PaperMagazineOrderInput) {
   const response = await axios.post<unknown>('/api/papermag', { data: input })
   return paymentResponseSchema.parse(response.data).data
@@ -171,7 +157,6 @@ export {
   decryptedTradeInfoSchema,
   getMerchandiseAndShippingFeeInfo,
   getPlanInfoByIdAndShouldFreight,
-  hasCompleteContact,
   newebPayReturnSchema,
   paperMagazineOrderInputSchema,
   PLAN,
