@@ -54,9 +54,9 @@ export default function PlanSelection() {
   return (
     <section className="mx-auto flex w-full flex-col gap-3 px-5 py-6 xl:w-256 xl:px-0 xl:py-12">
       <div className="flex flex-col gap-3 xl:flex-row xl:flex-wrap xl:gap-x-15 xl:gap-y-6">
-        <div className="xl:w-120 xl:shrink-0">
+        <div className="xl:w-120 xl:shrink-0 xl:self-start">
           <Image
-            className="h-full w-full object-cover"
+            className="h-auto w-full"
             src={PlanBannerImage}
             alt="紙本雜誌訂閱方案"
             priority
