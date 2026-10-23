@@ -29,6 +29,7 @@ export default function PlanActionLink({
         className
       )}
       href={href}
+      variant="plain"
     >
       <span className="font-mm-sans text-lg font-medium">{title}</span>
       {subtitle && (

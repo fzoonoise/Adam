@@ -53,6 +53,7 @@ export default function Marketing({
               'w-full rounded-mm-l no-underline shadow-md hover:no-underline'
             )}
             href="/premiumsection/member"
+            variant="plain"
           >
             回會員專區
           </Link>

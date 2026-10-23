@@ -31,6 +31,7 @@ function FailedOrderResult() {
           'w-full max-w-105 min-w-60 rounded-mm-m text-lg no-underline shadow-md hover:no-underline'
         )}
         href="/papermag"
+        variant="plain"
       >
         重新選擇方案
       </Link>

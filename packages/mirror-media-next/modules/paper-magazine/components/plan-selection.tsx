@@ -41,6 +41,7 @@ function ContactLink({ desktop = false }: { desktop?: boolean }) {
         desktop ? 'hidden xl:inline-flex' : 'xl:hidden'
       )}
       href={href}
+      variant="plain"
       rel={desktop ? 'noreferrer noopener' : undefined}
       target={desktop ? '_blank' : undefined}
     >
@@ -111,6 +112,7 @@ export default function PlanSelection() {
                     'h-auto min-h-18 w-full flex-col gap-1 rounded-mm-l no-underline shadow-md hover:no-underline'
                   )}
                   href={`/papermag/${plan.id}`}
+                  variant="plain"
                 >
                   <span className="text-lg font-medium">訂購{plan.title}</span>
                   <span className="text-mm-body2 font-normal opacity-70">

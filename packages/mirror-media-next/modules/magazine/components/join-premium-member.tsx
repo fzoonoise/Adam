@@ -30,6 +30,7 @@ export default function JoinPremiumMember() {
               'h-auto min-h-20 w-full rounded-mm-l text-mm-body-l font-medium tracking-wider no-underline shadow-md hover:no-underline md:w-120'
             )}
             href="/subscribe"
+            variant="plain"
             target="_blank"
           >
             加入訂閱會員
