@@ -1,5 +1,5 @@
 import type { ChangeEvent, FormEvent, InputHTMLAttributes } from 'react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 import { MinusIcon, PlusIcon } from 'lucide-react'
 
@@ -107,7 +107,8 @@ function FormField({
   ...props
 }: FormFieldProps) {
   const [hasError, setHasError] = useState(false)
-  const inputId = id ?? `paper-magazine-${name}`
+  const generatedId = useId()
+  const inputId = id ?? generatedId
 
   return (
     <div className={cn('mt-6', className)}>
@@ -511,6 +512,18 @@ function ReceiptSection({
             value === RECEIPT_OPTION.WITH_CARRIER ||
             value === RECEIPT_OPTION.TRIPLE
           ) {
+            if (
+              option === RECEIPT_OPTION.DONATE ||
+              option === RECEIPT_OPTION.TRIPLE
+            ) {
+              setCarrierOption(null)
+            }
+            if (
+              option === RECEIPT_OPTION.WITH_CARRIER ||
+              option === RECEIPT_OPTION.TRIPLE
+            ) {
+              setDonateOption(null)
+            }
             onOptionChange(value)
           }
         }}
@@ -830,6 +843,10 @@ export default function PaperMagazineForm({ plan }: { plan: PlanId }) {
       [event.target.name]: event.target.value,
     }))
   }
+  const changeSameAsOrderer = (checked: boolean) => {
+    setRecipient(checked ? emptyRecipient : effectiveRecipient)
+    setSameAsOrderer(checked)
+  }
 
   return (
     <>
@@ -869,7 +886,7 @@ export default function PaperMagazineForm({ plan }: { plan: PlanId }) {
               <Checkbox
                 checked={sameAsOrderer}
                 id="same-as-orderer"
-                onCheckedChange={setSameAsOrderer}
+                onCheckedChange={changeSameAsOrderer}
               />
               同訂購人資訊
             </Label>
