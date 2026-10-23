@@ -31,11 +31,16 @@ type CarrierOption = {
 type ReceiptData =
   | { name: '捐贈發票'; value: DonateOption | null }
   | {
-      name:
-        | '二聯式發票（含載具）- 電子發票載具'
-        | '二聯式發票（含載具）- 手機條碼'
-        | '二聯式發票（含載具）- 自然人憑證'
-      value: CarrierOption | string | null
+      name: '二聯式發票（含載具）- 電子發票載具'
+      value: CarrierOption
+    }
+  | {
+      name: '二聯式發票（含載具）- 手機條碼'
+      value: string
+    }
+  | {
+      name: '二聯式發票（含載具）- 自然人憑證'
+      value: string
     }
   | {
       name: '三聯式發票'

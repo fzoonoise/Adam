@@ -696,14 +696,22 @@ export default function PaperMagazineForm({ plan }: { plan: PlanId }) {
 
   const hasCompleteReceipt = (() => {
     if (!receiptData || !receiptOption) return false
-    if (receiptData.name === '捐贈發票') return receiptData.value !== null
-    if (receiptData.name === '三聯式發票') {
-      return Boolean(receiptData.value.抬頭 && receiptData.value.統一編號)
+
+    switch (receiptData.name) {
+      case '捐贈發票':
+        return receiptData.value !== null
+      case '三聯式發票':
+        return Boolean(receiptData.value.抬頭 && receiptData.value.統一編號)
+      case '二聯式發票（含載具）- 電子發票載具':
+        return true
+      case '二聯式發票（含載具）- 手機條碼':
+      case '二聯式發票（含載具）- 自然人憑證':
+        return receiptData.value.length > 0
+      default: {
+        const unhandledReceipt: never = receiptData
+        throw new Error(`Unexpected receipt data: ${String(unhandledReceipt)}`)
+      }
     }
-    if (receiptData.name.endsWith('電子發票載具')) {
-      return receiptData.value !== null
-    }
-    return typeof receiptData.value === 'string' && receiptData.value.length > 0
   })()
 
   const hasRequiredValues = Boolean(
@@ -745,17 +753,28 @@ export default function PaperMagazineForm({ plan }: { plan: PlanId }) {
     let carrierType = ''
     let carrierNum = ''
     if (isCarrier) {
-      if (receiptData.name.endsWith('手機條碼')) {
-        carrierType = '0'
-        carrierNum =
-          typeof receiptData.value === 'string' ? receiptData.value : ''
-      } else if (receiptData.name.endsWith('自然人憑證')) {
-        carrierType = '1'
-        carrierNum =
-          typeof receiptData.value === 'string' ? receiptData.value : ''
-      } else if (receiptData.name.endsWith('電子發票載具')) {
-        carrierType = '2'
-        carrierNum = orderer.email
+      switch (receiptData.name) {
+        case '二聯式發票（含載具）- 手機條碼':
+          carrierType = '0'
+          carrierNum = receiptData.value
+          break
+        case '二聯式發票（含載具）- 自然人憑證':
+          carrierType = '1'
+          carrierNum = receiptData.value
+          break
+        case '二聯式發票（含載具）- 電子發票載具':
+          carrierType = '2'
+          carrierNum = orderer.email
+          break
+        case '捐贈發票':
+        case '三聯式發票':
+          break
+        default: {
+          const unhandledReceipt: never = receiptData
+          throw new Error(
+            `Unexpected receipt data: ${String(unhandledReceipt)}`
+          )
+        }
       }
     }
 
