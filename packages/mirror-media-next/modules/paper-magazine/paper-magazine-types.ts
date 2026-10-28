@@ -48,13 +48,6 @@ type ReceiptData =
     }
   | null
 
-type PaymentPayload = {
-  MerchantID: string
-  TradeInfo: string
-  TradeSha: string
-  Version: string
-}
-
 type PaperMagazineOrderInput =
   FetchPaymentDataOfPapermagMutationVariables['data']
 
@@ -92,7 +85,6 @@ export type {
   OrderData,
   OrdererValues,
   PaperMagazineOrderInput,
-  PaymentPayload,
   PlanId,
   ReceiptData,
   ReceiptOption,

@@ -82,6 +82,8 @@ const paymentResponseSchema = z.object({
   }),
 })
 
+type PaymentPayload = z.infer<typeof paymentResponseSchema>['data']
+
 const paperMagazineOrderInputSchema = z
   .object({
     buyerName: z.string().nullish(),
@@ -163,3 +165,5 @@ export {
   PLAN_LIST,
   RECEIPT_OPTION,
 }
+
+export type { PaymentPayload }

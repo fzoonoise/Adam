@@ -28,6 +28,7 @@ import { generateErrorReportInfo } from '@/utils/log/error-log'
 import { sendErrorLog } from '@/utils/log/send-log'
 import { normalizeError } from '@/utils/normalize-error'
 
+import type { PaymentPayload } from '../paper-magazine-data'
 import {
   COUPON_DISCOUNT,
   createPaperMagazinePayment,
@@ -40,7 +41,6 @@ import type {
   DonateOption,
   OrdererValues,
   PaperMagazineOrderInput,
-  PaymentPayload,
   PlanId,
   ReceiptData,
   ReceiptOption,
