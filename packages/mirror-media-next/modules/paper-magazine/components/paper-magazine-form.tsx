@@ -1,4 +1,9 @@
-import type { ChangeEvent, FormEvent, InputHTMLAttributes } from 'react'
+import type {
+  ChangeEvent,
+  FormEvent,
+  InputHTMLAttributes,
+  RefObject,
+} from 'react'
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 import { MinusIcon, PlusIcon } from 'lucide-react'
@@ -651,19 +656,19 @@ function ReceiptSection({
 
 function NewebPayForm({
   payload,
-  inputRef,
+  formRef,
 }: {
   payload: PaymentPayload
-  inputRef: React.RefObject<HTMLInputElement | null>
+  formRef: RefObject<HTMLFormElement | null>
 }) {
   return (
-    <form name="newebpay" method="post" action={NEWEBPAY_PAPERMAG_API_URL}>
-      <input
-        ref={inputRef}
-        type="hidden"
-        name="MerchantID"
-        value={payload.MerchantID}
-      />
+    <form
+      ref={formRef}
+      name="newebpay"
+      method="post"
+      action={NEWEBPAY_PAPERMAG_API_URL}
+    >
+      <input type="hidden" name="MerchantID" value={payload.MerchantID} />
       <input type="hidden" name="TradeInfo" value={payload.TradeInfo} />
       <input type="hidden" name="TradeSha" value={payload.TradeSha} />
       <input type="hidden" name="Version" value={payload.Version} />
@@ -673,7 +678,7 @@ function NewebPayForm({
 
 export default function PaperMagazineForm({ plan }: { plan: PlanId }) {
   const router = useRouter()
-  const merchantIdRef = useRef<HTMLInputElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [count, setCount] = useState(1)
   const [renewCouponApplied, setRenewCouponApplied] = useState(false)
@@ -691,8 +696,8 @@ export default function PaperMagazineForm({ plan }: { plan: PlanId }) {
 
   // 為了確保資料先填入 form 中
   useEffect(() => {
-    if (paymentPayload.MerchantID && merchantIdRef.current?.form) {
-      merchantIdRef.current.form.submit()
+    if (paymentPayload.MerchantID && formRef.current) {
+      formRef.current.submit()
       setIsProcessing(false)
     }
   }, [paymentPayload])
@@ -994,7 +999,7 @@ export default function PaperMagazineForm({ plan }: { plan: PlanId }) {
           />
         </div>
       </form>
-      <NewebPayForm inputRef={merchantIdRef} payload={paymentPayload} />
+      <NewebPayForm formRef={formRef} payload={paymentPayload} />
     </>
   )
 }
