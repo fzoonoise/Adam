@@ -1,9 +1,6 @@
 import type { FetchAnnouncementsQuery } from '@/apollo/__generated__/content/graphql'
 import type { FetchPaymentDataOfPapermagMutationVariables } from '@/apollo/__generated__/member/graphql'
 
-type PlanId = 1 | 2
-type ReceiptOption = 'donate' | 'invoiceWithCarrier' | 'tripleInvoice'
-
 type ContactValues = {
   username: string
   cellphone: string
@@ -85,8 +82,6 @@ export type {
   OrderData,
   OrdererValues,
   PaperMagazineOrderInput,
-  PlanId,
   ReceiptData,
-  ReceiptOption,
   RecipientValues,
 }

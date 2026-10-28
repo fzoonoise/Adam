@@ -19,10 +19,8 @@ const magazineRouteParamsSchema = z.object({
   issue: z.string().min(1),
 })
 
-type MagazineRouteParams = ParsedUrlQuery & {
-  book: string
-  issue: string
-}
+type MagazineRouteParams = ParsedUrlQuery &
+  z.infer<typeof magazineRouteParamsSchema>
 
 type MagazineViewerPageProps = Record<string, unknown> & {
   book: string

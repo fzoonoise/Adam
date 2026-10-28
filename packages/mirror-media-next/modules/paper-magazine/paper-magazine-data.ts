@@ -1,18 +1,22 @@
 import axios from 'axios'
 import { z } from 'zod'
 
-import type { PaperMagazineOrderInput, PlanId } from './paper-magazine-types'
+import type { PaperMagazineOrderInput } from './paper-magazine-types'
 
 const PLAN = {
   ONE_YEAR: 1,
   TWO_YEAR: 2,
-} as const satisfies Record<string, PlanId>
+} as const
+
+type PlanId = (typeof PLAN)[keyof typeof PLAN]
 
 const RECEIPT_OPTION = {
   DONATE: 'donate',
   WITH_CARRIER: 'invoiceWithCarrier',
   TRIPLE: 'tripleInvoice',
 } as const
+
+type ReceiptOption = (typeof RECEIPT_OPTION)[keyof typeof RECEIPT_OPTION]
 
 const SHIPPING_FEE_PER_YEAR = 1040
 const PLAN_LIST = [
@@ -166,4 +170,4 @@ export {
   RECEIPT_OPTION,
 }
 
-export type { PaymentPayload }
+export type { PaymentPayload, PlanId, ReceiptOption }
