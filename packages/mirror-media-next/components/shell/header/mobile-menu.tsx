@@ -223,7 +223,7 @@ function MobileMenu({ navigation, topics }: MobileMenuProps) {
               className={shellBrandLinkClass}
               href={link.href}
               key={link.label}
-              rel="noopener noreferrer"
+              rel="noopener"
               target="_blank"
             >
               <Image

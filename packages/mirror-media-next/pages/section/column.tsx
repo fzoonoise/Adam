@@ -94,7 +94,7 @@ export default function ColumnPage({
             <div className="mx-auto w-[calc(100%-464px)] max-w-187.5 flex-1 lg:mx-0">
               {gqlPostsCount === posts.length ? (
                 <SectionArticles
-                  from="cate_list"
+                  storyList="cate_list"
                   posts={posts}
                   postsCount={posts.length}
                   renderPageSize={RENDER_PAGE_SIZE}
@@ -103,7 +103,7 @@ export default function ColumnPage({
               ) : (
                 <ColumnList
                   filterPostIds={filterPostIds}
-                  from="cate_list"
+                  storyList="cate_list"
                   gqlPostsCount={gqlPostsCount}
                   posts={posts}
                   renderPageSize={RENDER_PAGE_SIZE}

@@ -6,6 +6,7 @@ import {
   type ResolvedDataLayerPayload,
 } from '@/types/dataLayer'
 import { compactDataLayer } from '@/utils/gtm/build-data-layer'
+import { takeStoryListForPageView } from '@/utils/gtm/story-list'
 
 /**
  * 首次進站與 CSR 換頁時更新 dataLayer 維度，並送獨立事件 `mm_page_view`。
@@ -17,7 +18,11 @@ export function pushDataLayer(fields: ResolvedDataLayerPayload = {}) {
     return
   }
 
-  const compact = compactDataLayer(fields)
+  const storyList = takeStoryListForPageView()
+  const compact = compactDataLayer({
+    ...fields,
+    ...(storyList ? { story_list: storyList } : {}),
+  })
   const payload: Record<string, string | undefined> = {
     event: 'mm_page_view',
   }

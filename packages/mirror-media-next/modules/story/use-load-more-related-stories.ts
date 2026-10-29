@@ -17,6 +17,15 @@ export function useLoadMoreRelatedStories(
   const [allRelatedStories, setAllRelatedStories] = useState(
     initialRelatedStories
   )
+  const [prevSlug, setPrevSlug] = useState(slug)
+
+  // Client-side navigation between stories reuses this page instance, so
+  // the state must be reset to the new story's GSSP(getServerSideProps) data.
+  if (prevSlug !== slug) {
+    setPrevSlug(slug)
+    setAllRelatedStories(initialRelatedStories)
+  }
+
   const allRelatedStoriesRef = useRef(allRelatedStories)
 
   useEffect(() => {

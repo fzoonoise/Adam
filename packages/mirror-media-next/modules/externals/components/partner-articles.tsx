@@ -5,25 +5,26 @@ import { ArticleList } from '@/modules/list-article/components/article-list'
 import type { ArticleListItemData } from '@/modules/list-article/list-article-types'
 import LoadingPage from '@/public/images-next/loading_page.gif'
 import { fetchExternalsByPartnerSlug } from '@/utils/api/externals'
+import type { StoryList } from '@/utils/gtm/story-list'
 
 import { toExternalListItemData } from '../externals-data'
 
 type PartnerArticlesProps = {
   externals: ArticleListItemData[]
   externalsCount: number
-  from?: string
   partnerSlug: string
   renderPageSize: number
   section: { name: string; slug: string }
+  storyList?: StoryList
 }
 
 export default function PartnerArticles({
   externals,
   externalsCount,
-  from,
   partnerSlug,
   renderPageSize,
   section,
+  storyList,
 }: PartnerArticlesProps) {
   const fetchPageSize = renderPageSize * 2
 
@@ -66,7 +67,7 @@ export default function PartnerArticles({
     >
       {(renderList) => (
         <ArticleList
-          from={from}
+          storyList={storyList}
           // `InfiniteScrollList` declares its render list as `Object[]`, a
           // JSDoc type in untyped JavaScript. Correcting it is a separate
           // change.

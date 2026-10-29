@@ -1,19 +1,41 @@
 import { Fragment, useMemo } from 'react'
 import NextImage from 'next/image'
+import type { RawDraftContentState } from 'draft-js'
 import { CircleDollarSignIcon } from 'lucide-react'
 
 import { Badge, Link, Typography } from '@/components/ui'
-import { SITE_URL } from '@/config/index.mjs'
+import { SITE_BASE_PATH, SITE_URL } from '@/config/index.mjs'
 import { DEFAULT_OG_IMAGE_URL } from '@/constants'
 import { RelatedStory, StoryPost } from '@/modules/story/story-types'
 
 import { Blocks, renderTextWithLinks } from './blocks'
 import { CopyLinkButton } from './copy-link-button'
 import { IconLink } from './icon-link'
-import NextResponsiveImage from './next-responsive-image'
 import { PublicDate } from './public-date'
 import { RelativePostLink } from './relative-post-link'
 import { type ElementVariantProps, ThemeElement } from './theme-element'
+
+/** 手機文中廣告只接在第 1、第 5 段有文字的內文後面。 */
+const MB_AD_AFTER_TEXT_PARAGRAPH = {
+  1: 'MB_AT1',
+  5: 'MB_AT2',
+} as const
+
+type MbInContentAdKey =
+  (typeof MB_AD_AFTER_TEXT_PARAGRAPH)[keyof typeof MB_AD_AFTER_TEXT_PARAGRAPH]
+
+function getTextParagraphOrdinals(blocks: RawDraftContentState['blocks']) {
+  const ordinalByKey = new Map<string, number>()
+  let count = 0
+
+  for (const block of blocks) {
+    if (block.type !== 'unstyled' || block.text.trim().length === 0) continue
+    count += 1
+    ordinalByKey.set(block.key, count)
+  }
+
+  return { ordinalByKey, count }
+}
 
 type PostLayoutProps = Pick<
   StoryPost,
@@ -44,26 +66,28 @@ type PostLayoutProps = Pick<
   renderDable?: () => React.ReactNode
   renderNextUp?: () => React.ReactNode
   renderAdInContent?: () => React.ReactNode
+  renderMbAdInContent?: (adKey: MbInContentAdKey) => React.ReactNode
+  renderAdBelowRelated?: () => React.ReactNode
 }
 
 const actionList = [
   {
-    resource: '/images/sns-line.svg',
+    resource: `${SITE_BASE_PATH}/images/sns-line.svg`,
     label: '加入',
     href: 'https://lin.ee/dkD1s4q',
   },
   {
-    resource: '/images/sns-ig.svg',
+    resource: `${SITE_BASE_PATH}/images/sns-ig.svg`,
     label: '追蹤',
     href: 'https://www.instagram.com/mirror_media/',
   },
   {
-    resource: '/images/yt.svg',
+    resource: `${SITE_BASE_PATH}/images/yt.svg`,
     label: '訂閱',
     href: 'https://www.youtube.com/channel/UCYkldEK001GxR884OZMFnRw?sub_confirmation=1',
   },
   {
-    resource: '/images/sns-mm.png',
+    resource: `${SITE_BASE_PATH}/images/sns-mm.png`,
     label: '下載',
     href: 'https://www.mirrormedia.mg/story/20161228corpmkt001/?utm_source=magzine&utm_campaign=mm_app_download&utm_medium=qrcode',
   },
@@ -93,6 +117,8 @@ export default function PostLayout(props: PostLayoutProps) {
     slug,
     relativeStory,
     renderAdInContent,
+    renderMbAdInContent,
+    renderAdBelowRelated,
     renderAside,
     renderNextUp,
     renderDable,
@@ -103,8 +129,27 @@ export default function PostLayout(props: PostLayoutProps) {
     : 'post'
 
   const canonicalUrl = `https://${SITE_URL}/story/${slug}`
-  const mainCategory = sections?.[0]
-  const subCategories = categories?.[0]
+  const sectionList = sections ?? []
+  const categoryList = categories ?? []
+
+  const mainCategory =
+    sectionList.length === 1
+      ? sectionList[0]
+      : sectionList.find((section) => section?.slug !== 'marketing')
+
+  const subCategories =
+    categoryList.length === 1
+      ? categoryList[0]
+      : categoryList.find((category) => category?.slug !== 'marketing')
+
+  const textParagraphs = useMemo(
+    () => getTextParagraphOrdinals(content.blocks),
+    [content.blocks]
+  )
+  const SIZES_HERO =
+    '(min-width: 1280px) 800px, (min-width: 768px) calc(100vw - 48px), 100vw'
+  const webpSrcSet = buildSrcSet(heroImage?.resizedWebp)
+  const defaultSrcSet = buildSrcSet(heroImage?.resized)
 
   const summary = useMemo(() => {
     return content.blocks
@@ -122,7 +167,7 @@ export default function PostLayout(props: PostLayoutProps) {
   }, [content])
 
   return (
-    <div className="max-w-7xl pt-4 md:mx-6 md:grid-cols-12 xl:mx-auto xl:grid xl:grid-cols-[repeat(12,minmax(0,1fr))_424px] xl:gap-x-14">
+    <div className="max-w-7xl pt-4 md:mx-6 md:grid-cols-12 lg:px-10 xl:mx-auto xl:grid xl:grid-cols-[repeat(12,minmax(0,1fr))_424px] xl:gap-x-14">
       <article className="relative grid-cols-subgrid space-y-7 gap-x-0 xl:col-span-12 xl:grid xl:grid-rows-[repeat(5,min-content)_auto]">
         {categories && Array.isArray(categories) && (
           <div className="order-1 col-span-full flex items-center justify-center md:col-span-4 md:justify-start">
@@ -184,7 +229,7 @@ export default function PostLayout(props: PostLayoutProps) {
           publishedDate={publishedDate}
           updatedAt={updatedAt}
         />
-        <div className="sticky top-27 z-1 order-4 col-span-full flex justify-around gap-x-3 bg-white p-2 md:static md:col-start-8 md:justify-end md:py-0">
+        <div className="sticky top-27 z-1 order-4 col-span-full flex items-start justify-around gap-x-3 bg-white p-2 md:static md:col-start-8 md:justify-end md:py-0">
           <IconLink
             href="https://google.com/preferences/source?q=mirrormedia.mg"
             className="GTM-click-preferred-source flex h-7 items-center rounded-full border px-1.5 py-1 md:gap-1 md:px-2.5"
@@ -192,7 +237,7 @@ export default function PostLayout(props: PostLayoutProps) {
             <NextImage
               width={14}
               height={14}
-              src="/images/google-logo.svg"
+              src={`${SITE_BASE_PATH}/images/google-logo.svg`}
               alt="google-logo"
             />
             <ThemeElement
@@ -204,7 +249,7 @@ export default function PostLayout(props: PostLayoutProps) {
           </IconLink>
           <IconLink
             href={`https://www.facebook.com/share.php?u=${canonicalUrl}`}
-            src="/images/fb-logo.svg"
+            src={`${SITE_BASE_PATH}/images/fb-logo.svg`}
             alt="facebook-logo"
             rel="noopener noreferrer"
             target="_blank"
@@ -212,7 +257,7 @@ export default function PostLayout(props: PostLayoutProps) {
           />
           <IconLink
             href={`https://social-plugins.line.me/lineit/share?u=${canonicalUrl}`}
-            src="/images/line-logo.svg"
+            src={`${SITE_BASE_PATH}/images/line-logo.svg`}
             alt="line-logo"
             rel="noopener noreferrer"
             target="_blank"
@@ -229,7 +274,7 @@ export default function PostLayout(props: PostLayoutProps) {
             <NextImage
               width={28}
               height={28}
-              src="/images/threads-logo.svg"
+              src={`${SITE_BASE_PATH}/images/threads-logo.svg`}
               alt="threads-logo"
               className="scale-70 transform invert-100"
             />
@@ -248,36 +293,34 @@ export default function PostLayout(props: PostLayoutProps) {
             <NextImage
               width={28}
               height={28}
-              src="/images/link-logo.svg"
+              src={`${SITE_BASE_PATH}/images/link-logo.svg`}
               alt="link-logo"
             />
           </CopyLinkButton>
         </div>
         <figure className="order-5 col-span-full">
           <picture className="relative block aspect-3/2">
-            <NextResponsiveImage
-              fill
-              className="aspect-4/3 object-cover"
-              placeholder="blur"
-              blurDataURL="/images-next/loading.gif"
+            {webpSrcSet && (
+              <source
+                type="image/webp"
+                srcSet={webpSrcSet}
+                sizes={SIZES_HERO}
+              />
+            )}
+            <img
+              className="h-auto w-full object-cover"
+              srcSet={defaultSrcSet}
+              sizes={SIZES_HERO}
               src={
-                typeof heroImage?.resized?.original === 'string'
-                  ? heroImage?.resized?.original?.replace(
-                      /\.(jpg|png)$/i,
-                      '.webP'
-                    )
-                  : DEFAULT_OG_IMAGE_URL
+                heroImage?.resized?.w1200 ||
+                heroImage?.resized?.w1600 ||
+                heroImage?.resized?.original ||
+                DEFAULT_OG_IMAGE_URL
               }
-              sizes="(max-width: 768px) 50vw, 30vw"
-              srcSet={[480, 800]}
               alt={heroCaption ?? title ?? ''}
-              priority
-              fallback={
-                typeof heroImage?.resized?.original === 'string'
-                  ? heroImage?.resized?.original
-                  : DEFAULT_OG_IMAGE_URL
-              }
-              errorImage={DEFAULT_OG_IMAGE_URL}
+              width="100%"
+              height="auto"
+              fetchPriority="high"
             />
           </picture>
           {heroCaption && (
@@ -290,7 +333,7 @@ export default function PostLayout(props: PostLayoutProps) {
             </Typography>
           )}
         </figure>
-        <section className="order-6 col-span-full flex flex-wrap items-center justify-center gap-x-3 gap-y-2 pt-9 pb-5 md:order-2 md:col-span-8 md:col-end-0 md:justify-start md:py-0 lg:py-0">
+        <section className="order-6 col-span-full flex flex-wrap items-center justify-center gap-x-3 gap-y-2 pb-5 md:order-2 md:col-span-8 md:col-end-0 md:justify-start md:py-0 lg:py-0">
           <CreditNames label="文" creditPeoples={writers} />
           <CreditNames label="攝影" creditPeoples={photographers} />
           <CreditNames label="影音" creditPeoples={camera_man} />
@@ -330,18 +373,41 @@ export default function PostLayout(props: PostLayoutProps) {
             renderPostInContent={(block, paragraphCount) => {
               if (!block?.text) return null
 
-              if (paragraphCount === 2 && relativeStory) {
-                return (
-                  <Fragment key={`paragraph-${paragraphCount}`}>
-                    <Typography as="p" variant="body-l" className="mx-2">
-                      {renderTextWithLinks(block, content.entityMap)}
-                    </Typography>
+              const textOrdinal = textParagraphs.ordinalByKey.get(block.key)
+              const adKey =
+                textOrdinal === 1 || textOrdinal === 5
+                  ? MB_AD_AFTER_TEXT_PARAGRAPH[textOrdinal]
+                  : undefined
+              // 下一段沒有文字就不出現（後面還有 unstyled 文字段落才渲染）。
+              const mobileAd =
+                adKey &&
+                textOrdinal != null &&
+                textOrdinal < textParagraphs.count
+                  ? renderMbAdInContent?.(adKey)
+                  : null
+
+              return (
+                <Fragment key={`paragraph-${paragraphCount}`}>
+                  <Typography
+                    as="p"
+                    variant="body-l"
+                    className={
+                      paragraphCount === 4
+                        ? 'mx-2 scroll-m-20 md:mx-0'
+                        : 'mx-2 md:mx-0'
+                    }
+                  >
+                    {renderTextWithLinks(block, content.entityMap)}
+                  </Typography>
+                  {mobileAd}
+                  {paragraphCount === 2 && relativeStory && (
                     <div className="mx-2 scroll-m-20 md:mx-0">
                       <ThemeElement className="w-fit rounded-md rounded-b-none bg-mm-second-700 px-3 pt-1 text-sm text-mm-neutral-100">
                         延伸閱讀
                       </ThemeElement>
                       <Link
-                        href={`/story/${relativeStory.slug}?from=referral_contents`}
+                        data-story-list="referral_contents"
+                        href={`/story/${relativeStory.slug}`}
                       >
                         <ThemeElement
                           className="rounded-md rounded-tl-none p-2 text-lg font-bold text-mm-neutral-700 decoration-mm-neutral-700"
@@ -352,45 +418,12 @@ export default function PostLayout(props: PostLayoutProps) {
                         </ThemeElement>
                       </Link>
                     </div>
-                  </Fragment>
-                )
-              }
-
-              if (paragraphCount === 3) {
-                return (
-                  <Fragment key={`paragraph-${paragraphCount}`}>
-                    <Typography as="p" variant="body-l" className="mx-2">
-                      {renderTextWithLinks(block, content.entityMap)}
-                    </Typography>
-                    {renderAdInContent?.()}
-                  </Fragment>
-                )
-              }
-
-              if (paragraphCount === 4) {
-                return (
-                  <Fragment key={`paragraph-${paragraphCount}`}>
-                    <Typography
-                      as="p"
-                      variant="body-l"
-                      className="mx-2 scroll-m-20 md:mx-0 xl:hidden"
-                    >
-                      {renderTextWithLinks(block, content.entityMap)}
-                    </Typography>
+                  )}
+                  {paragraphCount === 3 && renderAdInContent?.()}
+                  {paragraphCount === 4 && (
                     <RelativePosts relateds={relateds} />
-                  </Fragment>
-                )
-              }
-
-              return (
-                <Typography
-                  key={`paragraph-${paragraphCount}`}
-                  as="p"
-                  variant="body-l"
-                  className="mx-2"
-                >
-                  {renderTextWithLinks(block, content.entityMap)}
-                </Typography>
+                  )}
+                </Fragment>
               )
             }}
           />
@@ -401,9 +434,8 @@ export default function PostLayout(props: PostLayoutProps) {
               key={`tag-${tag?.name ?? index}`}
               href={`/tag/${tag?.slug}`}
               target="_blank"
-              rel="noreferrer"
             >
-              <Badge>{tag?.name}</Badge>
+              <Badge className="text-mm-h6">{tag?.name}</Badge>
             </Link>
           ))}
         </div>
@@ -412,12 +444,13 @@ export default function PostLayout(props: PostLayoutProps) {
             {renderNextUp()}
           </section>
         )}
+        {renderAdBelowRelated?.()}
         <div className="order-11 col-span-full grid gap-y-5 md:grid-cols-12">
           <div className="flex items-center justify-center gap-x-3 md:col-span-4 md:justify-start">
             <Link
               href="/donate"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener"
               className="inline-flex items-center gap-x-1 rounded-full border-mm-base-700 bg-mm-base-700 px-3 py-2 hover:bg-mm-base-600"
             >
               <CircleDollarSignIcon className="size-4 text-white" />
@@ -431,7 +464,7 @@ export default function PostLayout(props: PostLayoutProps) {
             <Link
               href="/subscribe"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener"
               className="inline-flex"
             >
               <Typography
@@ -519,7 +552,6 @@ function CreditNames({
           <Link
             href={`/author/${person.id}`}
             target="_blank"
-            rel="noreferrer"
             variant="muted"
             className="text-mm-subtitle"
           >
@@ -540,14 +572,16 @@ function RelativePosts({ relateds }: { relateds: StoryPost['relateds'] }) {
         <RelativePostLink
           className="flex overflow-hidden rounded-lg bg-mm-base-700 text-neutral-100"
           type="next"
-          href={`/story/${relateds[0]?.slug}?from=story_updown`}
+          data-story-list="story_updown"
+          href={`/story/${relateds[0]?.slug}`}
         >
           {relateds[0]?.title}
         </RelativePostLink>
         <RelativePostLink
           className="flex overflow-hidden rounded-lg bg-mm-base-700 text-neutral-100"
           type="prev"
-          href={`/story/${relateds[1]?.slug}?from=story_updown`}
+          data-story-list="story_updown"
+          href={`/story/${relateds[1]?.slug}`}
         >
           {relateds[1]?.title}
         </RelativePostLink>
@@ -559,7 +593,8 @@ function RelativePosts({ relateds }: { relateds: StoryPost['relateds'] }) {
       <RelativePostLink
         className="flex overflow-hidden rounded-lg bg-mm-base-700 text-neutral-100 xl:hidden"
         type="next"
-        href={`/story/${relateds[0]?.slug}?from=story_updown`}
+        data-story-list="story_updown"
+        href={`/story/${relateds[0]?.slug}`}
       >
         {relateds[0]?.title}
       </RelativePostLink>
@@ -570,7 +605,8 @@ function RelativePosts({ relateds }: { relateds: StoryPost['relateds'] }) {
       <RelativePostLink
         className="flex overflow-hidden rounded-lg bg-mm-base-700 text-neutral-100 xl:hidden"
         type="prev"
-        href={`/story/${relateds[1]?.slug}?from=story_updown`}
+        data-story-list="story_updown"
+        href={`/story/${relateds[1]?.slug}`}
       >
         {relateds[1]?.title}
       </RelativePostLink>
@@ -578,4 +614,22 @@ function RelativePosts({ relateds }: { relateds: StoryPost['relateds'] }) {
   }
 
   return null
+}
+
+function buildSrcSet(
+  resized?: Record<string, string | null | undefined> | null
+) {
+  if (!resized) return undefined
+  return Object.entries(resized)
+    .filter(
+      ([key, value]) =>
+        !['original', '__typename'].includes(key) && Boolean(value)
+    )
+    .sort(
+      (a, b) =>
+        parseInt(a[0].replace('w', ''), 10) -
+        parseInt(b[0].replace('w', ''), 10)
+    )
+    .map(([key, value]) => `${value} ${key.replace('w', '')}w`)
+    .join(', ')
 }

@@ -40,9 +40,9 @@ export type HeadersDataSection = {
   name: string
   categories: CategoryInHeadersDataSection[]
   /**
-   * Optional shell-only enrichment from `menu_sections_latest.json`.
-   * V3 header consumers ignore this field, while the V4 layout adapter
-   * uses it without issuing a second request from the browser.
+   * Optional menu-feed enrichment from `menu_sections_latest.json`.
+   * Legacy headers ignore this field; the shell selects two posts while
+   * homepage categories can reuse the full feed.
    */
   posts?: ShellSectionPost[]
 }
@@ -90,7 +90,8 @@ export type ShellFlashNews = {
 }
 
 /**
- * A section's two latest posts, used by the desktop navigation flyout.
+ * A section's latest posts from the menu feed. The navigation flyout selects
+ * two, while homepage categories use three.
  *
  * `heroImage` is null for posts that have no artwork, and `post_url` is an
  * absolute link into the environment that produced the file, so the shell
@@ -150,7 +151,10 @@ const fetchStaticJsonByUrl = async <T>(
   return { data: axiosRes?.data as T }
 }
 
-const errorLogger = (errorMessage: unknown): never => {
+const errorLogger = (
+  errorMessage: unknown,
+  logFields?: Record<string, unknown>
+): never => {
   const helpers = errors.helpers as typeof errors.helpers & {
     annotateAxiosError: (error: unknown) => Error
   }
@@ -158,6 +162,7 @@ const errorLogger = (errorMessage: unknown): never => {
   //WORKAROUND: print error in here. Should print in place where fetch function used, such as category/[slug]
   console.log(
     JSON.stringify({
+      ...(logFields ?? {}),
       severity: 'WARNING',
       message: errors.helpers.printAll(
         annotatingAxiosError,
@@ -255,14 +260,16 @@ const fetchShellFlashNews = async (): Promise<ShellFlashNews[]> => {
 }
 
 /**
- * The two latest posts per section, keyed by slug. It uses the same slugs as
+ * The latest posts per section, keyed by slug. It uses the same slugs as
  * the header sections file, so the navigation joins on them directly.
  */
 type FetchShellSectionPostsOptions = {
+  logFields?: Record<string, unknown>
   onError?: 'empty' | 'throw'
 }
 
 const fetchShellSectionPosts = async ({
+  logFields,
   onError = 'throw',
 }: FetchShellSectionPostsOptions = {}): Promise<ShellSectionPosts> => {
   try {
@@ -283,7 +290,7 @@ const fetchShellSectionPosts = async ({
       return {}
     }
 
-    return errorLogger(err)
+    return errorLogger(err, logFields)
   }
 }
 
@@ -300,6 +307,7 @@ const fetchShellTopicsData = async (): Promise<Topics> => {
 
 type FetchShellHeaderDataOptions = {
   logFields?: Record<string, unknown>
+  sectionPostsPromise?: Promise<ShellSectionPosts>
 }
 
 /**
@@ -307,6 +315,7 @@ type FetchShellHeaderDataOptions = {
  */
 const fetchShellHeaderData = async ({
   logFields,
+  sectionPostsPromise,
 }: FetchShellHeaderDataOptions = {}): Promise<ShellHeaderData> => {
   const [
     navigationResponse,
@@ -316,7 +325,7 @@ const fetchShellHeaderData = async ({
   ] = await Promise.allSettled([
     fetchShellNavigationData(),
     fetchShellTopicsData(),
-    fetchShellSectionPosts(),
+    sectionPostsPromise ?? fetchShellSectionPosts(),
     fetchShellFlashNews(),
   ])
 

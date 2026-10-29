@@ -1,6 +1,5 @@
 import { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
-import debounce from 'debounce'
 
 import { useMembership } from '../../modules/membership/membership-context'
 import { sendUserBehaviorLog } from '../../utils/log/send-log'
@@ -9,7 +8,7 @@ import { generateUserBehaviorLogInfo } from '../../utils/log/user-behavior-log'
  * Component for recording and sending user-behavior-log to Google Cloud Logging.
  * This component do two things:
  * 1. Create information of user behavior log by using utils function `generateUserBehaviorLogInfo`:
- * 2. Add four `useEffect` hook, each hook represents certain type of event we want to send:.
+ * 2. Add three `useEffect` hook, each hook represents certain type of event we want to send:.
  *    1. pageview event:
  *        - Send log when page is initialized.
  *        - Currently we detect pathname of router is changed, if changed, then send log.
@@ -19,10 +18,6 @@ import { generateUserBehaviorLogInfo } from '../../utils/log/user-behavior-log'
  *        - We add two event listener: `beforeunload` event in window, and `beforeHistoryChangeEvent` in next/router.
  *        - The former event listener is for page closed and navigated by `<a>`, the latter is for navigated by `next/link` or 'next/router'
  *        - To prevent two event listener trigger simultaneously, we add condition that if `beforeunload` is triggered, `beforeHistoryChangeEvent` would not triggered.
- *    3. scroll-to-80% event:
- *        - Send log when user at 80% of height.
- *        - For instance, if device height is 1000px, when user scroll to position which is 800px(or larger) counting from top, then send log.
- *        - We register `scroll` event in window, and use package `debounce` to prevent performance issue.
  *    3. click event:
  *        - Send log when user clicking.
  *        - We register `click` event in window.
@@ -106,39 +101,6 @@ export default function UserBehaviorLogger({
       router.events.off('beforeHistoryChange', beforeHistoryChangeEvent)
     }
   }, [router, isLogInProcessFinished, userBehaviorLogInfoPayload])
-
-  //scroll-to-80% event
-  useEffect(() => {
-    let ignore = false
-
-    if (!isLogInProcessFinished) {
-      return
-    }
-    function detectIsScrollTo80Percent() {
-      const totalPageHeight = document.body.scrollHeight
-      const scrollPoint = window.scrollY + window.innerHeight
-      return scrollPoint >= totalPageHeight * 0.8
-    }
-
-    const scrollToBottomEvent = () => {
-      if (ignore) {
-        return
-      }
-      const isScrollToBottom = detectIsScrollTo80Percent()
-      if (isScrollToBottom) {
-        const info = generateUserBehaviorLogInfo(
-          'scroll-to-80%',
-          userBehaviorLogInfoPayload
-        )
-        sendUserBehaviorLog(info)
-      }
-    }
-    window.addEventListener('scroll', debounce(scrollToBottomEvent, 500))
-    return () => {
-      ignore = true
-      window.removeEventListener('scroll', debounce(scrollToBottomEvent, 500))
-    }
-  }, [isLogInProcessFinished, userBehaviorLogInfoPayload])
 
   //click event
   useEffect(() => {

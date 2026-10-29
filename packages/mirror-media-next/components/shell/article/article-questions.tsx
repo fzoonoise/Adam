@@ -5,6 +5,7 @@ import { ChevronLeft } from 'lucide-react'
 
 import { ThemeElement } from '@/components/shell/article/theme-element'
 import { Typography } from '@/components/ui'
+import { SITE_BASE_PATH } from '@/config/index.mjs'
 import { generateFaqJsonLd } from '@/modules/story/story-json-ld'
 import type { StoryPost } from '@/modules/story/story-types'
 
@@ -28,7 +29,12 @@ export default function ArticleQuestions({
   return (
     <section>
       <div className="flex w-full justify-center gap-x-2.5 rounded-lg border border-mm-base-700 px-2 py-1">
-        <Image src="/images/sparks.svg" alt="sparks" width={20} height={20} />
+        <Image
+          src={`${SITE_BASE_PATH}/images/sparks.svg`}
+          alt="sparks"
+          width={20}
+          height={20}
+        />
         <Typography variant="h6" className="text-mm-neutral-700">
           FAQ
         </Typography>

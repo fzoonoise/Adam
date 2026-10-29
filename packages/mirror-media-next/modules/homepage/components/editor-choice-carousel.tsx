@@ -84,8 +84,9 @@ function EditorChoiceCarousel({ articles }: EditorChoiceCarouselProps) {
               <NextLink
                 aria-label={`編輯精選第 ${index + 1} 則，共 ${articles.length} 則：${article.title}`}
                 className="GTM-editorchoice-list absolute inset-0 block outline-none focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white focus-visible:outline-solid"
-                href={`${article.href}?from=main_index`}
-                rel="noopener noreferrer"
+                data-story-list="main_index"
+                href={article.href}
+                rel="noopener"
                 target="_blank"
               >
                 <ArticleImage

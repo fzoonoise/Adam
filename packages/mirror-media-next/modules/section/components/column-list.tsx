@@ -6,23 +6,24 @@ import { toArticleListItemData } from '@/modules/list-article/list-article-data'
 import type { ArticleListItemData } from '@/modules/list-article/list-article-types'
 import LoadingPage from '@/public/images-next/loading_page.gif'
 import { fetchPostsBySectionSlug } from '@/utils/api/section'
+import type { StoryList } from '@/utils/gtm/story-list'
 
 type ColumnListProps = {
   filterPostIds?: string[]
-  from?: string
   gqlPostsCount: number
   posts: ArticleListItemData[]
   renderPageSize: number
   section: { name: string; slug: string }
+  storyList?: StoryList
 }
 
 export default function ColumnList({
   filterPostIds = [],
-  from,
   gqlPostsCount,
   posts,
   renderPageSize,
   section,
+  storyList,
 }: ColumnListProps) {
   const fetchPageSize = renderPageSize * 2
   async function fetchPostsFromPage(page: number) {
@@ -68,7 +69,7 @@ export default function ColumnList({
     >
       {(renderList) => (
         <ArticleList
-          from={from}
+          storyList={storyList}
           // `InfiniteScrollList` declares its render list as `Object[]`, a
           // JSDoc type in untyped JavaScript. Correcting it is a separate
           // change.

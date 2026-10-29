@@ -6,20 +6,21 @@ import { toArticleListItemData } from '@/modules/list-article/list-article-data'
 import type { ArticleListItemData } from '@/modules/list-article/list-article-types'
 import LoadingPage from '@/public/images-next/loading_page.gif'
 import { fetchPostsByTagSlug } from '@/utils/api/tag'
+import type { StoryList } from '@/utils/gtm/story-list'
 
 type TagArticlesProps = {
-  from?: string
   posts: ArticleListItemData[]
   postsCount: number
   renderPageSize: number
+  storyList?: StoryList
   tagSlug: string
 }
 
 export default function TagArticles({
-  from,
   posts,
   postsCount,
   renderPageSize,
+  storyList,
   tagSlug,
 }: TagArticlesProps) {
   const fetchPageSize = renderPageSize * 2
@@ -65,7 +66,7 @@ export default function TagArticles({
         // A tag belongs to no section, so `ArticleList` falls back to the
         // `other` GPT page key — which is what the legacy page used.
         <ArticleList
-          from={from}
+          storyList={storyList}
           // `InfiniteScrollList` declares its render list as `Object[]`, a
           // JSDoc type in untyped JavaScript. Correcting it is a separate
           // change.

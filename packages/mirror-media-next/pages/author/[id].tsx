@@ -85,7 +85,7 @@ export default function AuthorPage({
             <div className="mx-auto w-[calc(100%-464px)] max-w-187.5 flex-1 lg:mx-0">
               <AuthorArticles
                 authorId={author.id}
-                from="author_list"
+                storyList="author_list"
                 posts={posts}
                 postsCount={postsCount}
                 renderPageSize={RENDER_PAGE_SIZE}

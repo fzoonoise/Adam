@@ -133,7 +133,7 @@ export default function GDPRNotification() {
               <a
                 href="https://www.mirrormedia.mg/story/privacy/"
                 target="_blank"
-                rel="noreferrer noopener"
+                rel="noopener"
               >
                 隱私權聲明
               </a>

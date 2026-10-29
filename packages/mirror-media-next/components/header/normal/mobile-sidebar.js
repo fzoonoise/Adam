@@ -353,11 +353,7 @@ export default function MobileSidebar({
           <SubBrandList>
             {subBrands.map((brand) => (
               <li key={brand.name}>
-                <a
-                  href={brand.href}
-                  target="_blank"
-                  rel="noopener noreferer noreferrer"
-                >
+                <a href={brand.href} target="_blank" rel="noopener">
                   <Image
                     width={brand.imageSize.colorless.width}
                     height={brand.imageSize.colorless.height}
@@ -380,12 +376,7 @@ export default function MobileSidebar({
         </SideBarBottom>
         <SocialMediaList>
           {socialMedia.map(({ name, href }) => (
-            <a
-              key={name}
-              href={href}
-              target="_blank"
-              rel="noreferrer noopenner"
-            >
+            <a key={name} href={href} target="_blank" rel="noopener">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 className={name}

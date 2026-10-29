@@ -49,7 +49,7 @@ const shellUtilityLinks: readonly ShellUtilityLink[] = [
   {
     href: '/magazine',
     label: '動態雜誌',
-    rel: 'noopener noreferrer',
+    rel: 'noopener',
     target: '_blank',
   },
   { href: '/papermag', label: '訂閱紙本雜誌' },

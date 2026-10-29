@@ -211,7 +211,7 @@ export default function RelatedArticleList({
             <Link
               href={related.url}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener"
               className={`article-image GTM-story-related-list ${
                 related.isMesoRecommend
                   ? 'GTM-story-related-miso'
@@ -241,7 +241,7 @@ export default function RelatedArticleList({
                     : 'GTM-story-related-editor'
                 }`}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener"
               >
                 {related.title}
               </Link>
@@ -256,7 +256,7 @@ export default function RelatedArticleList({
     <Link
       href="https://google.com/preferences/source?q=mirrormedia.mg"
       target="_blank"
-      rel="noreferrer noopener"
+      rel="noopener"
     >
       <GnewsGif src={gnewsGif} alt="Google News GIF" />
     </Link>

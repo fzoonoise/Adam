@@ -83,6 +83,15 @@ const postExternalSchema = z
 
 const popularNewsSchema = z.array(z.unknown())
 
+const menuSectionPostSchema = z.object({
+  heroImage: z.string().nullish(),
+  publishedDate: z.string().min(1),
+  slug: z.string().trim().min(1),
+  title: z.string().trim().min(1),
+})
+
+const menuSectionPostsSchema = z.array(menuSectionPostSchema)
+
 const forumHeadlinesSchema = z
   .object({
     externals: z.array(z.unknown()).optional().default([]),
@@ -250,6 +259,36 @@ function parsePopularNews(input: unknown): HomepageArticle[] | null {
     : null
 }
 
+function parseHomepageCategoryPosts(
+  input: unknown,
+  sectionName: string,
+  sectionSlug: string
+): HomepageArticle[] | null {
+  const result = monitorZodSafeParse(menuSectionPostsSchema, input, {
+    boundary: `gcs-static-json:menu-sections:${sectionSlug}`,
+    schemaName: 'menuSectionPostsSchema',
+  })
+
+  if (!result.success) return null
+
+  const seenSlugs = new Set<string>()
+  return result.data.flatMap((post) => {
+    if (seenSlugs.has(post.slug)) return []
+    seenSlugs.add(post.slug)
+
+    return [
+      {
+        href: `/story/${post.slug}/`,
+        imageUrl: post.heroImage?.trim() || DEFAULT_OG_IMAGE_URL,
+        key: `story:article:${post.slug}`,
+        publishedDate: post.publishedDate,
+        sectionName,
+        title: post.title,
+      },
+    ]
+  })
+}
+
 function parseForumHeadlines(input: unknown): HomepageArticle[] | null {
   const result = monitorZodSafeParse(forumHeadlinesSchema, input, {
     boundary: 'gcs-static-json:daily-column',
@@ -350,6 +389,7 @@ function normalizeGraphqlPosts(posts: GraphqlPost[] | null): HomepageArticle[] {
 export {
   normalizeGraphqlPosts,
   parseForumHeadlines,
+  parseHomepageCategoryPosts,
   parsePopularNews,
   parsePostExternal,
   parsePromoteVideos,

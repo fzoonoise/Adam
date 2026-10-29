@@ -228,7 +228,6 @@ export default function AmpMain({ postData, gptSlotSection }) {
             <TagItem
               key={tagItem.id}
               target="_blank"
-              rel="noreferrer"
               href={`/tag/${tagItem.slug}`}
             >
               {tagItem.name}

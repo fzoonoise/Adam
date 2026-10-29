@@ -134,7 +134,7 @@ export default function CategoryPage({
                 renderPageSize={RENDER_PAGE_SIZE}
                 isPremium={isPremium}
                 isNewsCategory={isNewsCategory}
-                from={'cate_list'}
+                storyList="cate_list"
               />
             </div>
 

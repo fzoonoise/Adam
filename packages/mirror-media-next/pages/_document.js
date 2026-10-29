@@ -36,6 +36,7 @@ export default class MyDocument extends Document {
   }
 
   render() {
+    const { inAmpMode } = this.props
     const gtmNoscriptSrc = getGtmNoscriptSrc(
       GTM_ID,
       GTM_AUTH || undefined,
@@ -76,10 +77,21 @@ export default class MyDocument extends Document {
             name="google-site-verification"
             content="8tUjQvQoBEANJ6nRE9fMnsw2qODvbAgqDjSkLj-Mdw0"
           />
-          <link
-            href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&display=swap"
-            rel="stylesheet"
-          />
+          {/* AMP pages fall back to system fonts so the render-blocking font stylesheet is skipped. */}
+          {!inAmpMode && (
+            <>
+              <link rel="preconnect" href="https://fonts.googleapis.com" />
+              <link
+                rel="preconnect"
+                href="https://fonts.gstatic.com"
+                crossOrigin="anonymous"
+              />
+              <link
+                href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300..900&family=Noto+Serif+TC:wght@400;600;900&display=swap"
+                rel="stylesheet"
+              />
+            </>
+          )}
         </Head>
 
         <body>

@@ -52,7 +52,6 @@ export default function Tags({ tags, tagColor = 'darkBlue', className = '' }) {
           key={tag.id}
           href={`/tag/${tag.slug}`}
           target="_blank"
-          rel="noreferrer"
         >
           {tag.name}
         </Tag>

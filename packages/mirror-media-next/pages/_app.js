@@ -26,6 +26,7 @@ import {
   resolvePageDataLayer,
 } from '../utils/gtm/build-data-layer'
 import { pushDataLayer } from '../utils/gtm/push-data-layer'
+import { rememberStoryListFromEvent } from '../utils/gtm/story-list'
 
 const PromoteTopic = dynamic(() => import('../components/promote-topic'), {
   ssr: false,
@@ -80,6 +81,19 @@ function MyApp({ Component, pageProps }) {
       resolvePageDataLayer(router.pathname, router.asPath, pageProps.dataLayer)
     )
   }, [isAmpPage, pageProps.dataLayer, router.asPath, router.pathname])
+
+  useEffect(() => {
+    if (isAmpPage) {
+      return
+    }
+
+    document.addEventListener('click', rememberStoryListFromEvent)
+    document.addEventListener('auxclick', rememberStoryListFromEvent)
+    return () => {
+      document.removeEventListener('click', rememberStoryListFromEvent)
+      document.removeEventListener('auxclick', rememberStoryListFromEvent)
+    }
+  }, [isAmpPage])
 
   // The service worker is bundled into public/sw.js by the `build:sw` script
   // (esbuild) and registered manually here, replacing the auto-registration

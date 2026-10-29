@@ -1,14 +1,20 @@
+import type { PrismAsidePlacementContext } from '@/components/ads/prism/prism-config'
+
 import { fetchPopularArticles } from '../aside-data'
 
 import { AsideArticleList } from './aside-article-list'
 
-export function PopularArticles() {
+type PopularArticlesProps = {
+  placement: Exclude<PrismAsidePlacementContext, 'homepage'>
+}
+
+export function PopularArticles({ placement }: PopularArticlesProps) {
   return (
     <AsideArticleList
       fetchFunc={fetchPopularArticles}
-      from="cate_hotnews"
+      storyList="cate_hotnews"
+      prismPlacement={placement}
       title="熱門文章"
-      withPopInAd
     />
   )
 }

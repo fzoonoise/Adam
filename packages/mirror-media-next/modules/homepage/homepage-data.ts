@@ -12,6 +12,7 @@ import {
   URL_STATIC_POST_EXTERNAL,
   URL_STATIC_PROMOTE_VIDEOS,
 } from '@/config/index.mjs'
+import type { ShellSectionPosts } from '@/utils/api'
 import { fetchStaticJsonByUrl } from '@/utils/api'
 import { fetchPostsBySectionSlug } from '@/utils/api/section'
 import { processSettledResult } from '@/utils/response-processor'
@@ -28,6 +29,7 @@ import {
 import {
   normalizeGraphqlPosts,
   parseForumHeadlines,
+  parseHomepageCategoryPosts,
   parsePopularNews,
   parsePostExternal,
   parsePromoteVideos,
@@ -153,10 +155,27 @@ async function fetchHomepagePromoVideos(
 }
 
 async function fetchHomepageCategories(
-  logFields?: Record<string, unknown>
+  logFields: Record<string, unknown> | undefined,
+  sectionPostsPromise: Promise<ShellSectionPosts>
 ): Promise<HomepageCategory[]> {
+  const sectionPosts = await sectionPostsPromise.catch(
+    (): ShellSectionPosts => ({})
+  )
+
   const responses = await Promise.allSettled(
     CATEGORY_CONFIG.map(async (category) => {
+      const posts = sectionPosts[category.slug]
+      const articles = posts
+        ? parseHomepageCategoryPosts(posts, category.name, category.slug)
+        : null
+
+      if (articles && articles.length >= HOMEPAGE_CATEGORY_ARTICLE_COUNT) {
+        return {
+          ...category,
+          articles: articles.slice(0, HOMEPAGE_CATEGORY_ARTICLE_COUNT),
+        }
+      }
+
       const response = await fetchPostsBySectionSlug(
         category.slug,
         HOMEPAGE_CATEGORY_ARTICLE_COUNT,
@@ -191,8 +210,14 @@ async function fetchHomepageCategories(
   })
 }
 
+/**
+ * Consumes the route's shared menu-feed promise instead of fetching it again.
+ * The route shares an empty map after a logged fetch failure; rejected inputs
+ * also fall back to GraphQL at the category data boundary.
+ */
 async function fetchHomepageData(
-  logFields?: Record<string, unknown>
+  logFields: Record<string, unknown> | undefined,
+  sectionPostsPromise: Promise<ShellSectionPosts>
 ): Promise<HomepageViewModel> {
   const [postResult, popularResult, forumResult, videoResult, categoryResult] =
     await Promise.allSettled([
@@ -200,7 +225,7 @@ async function fetchHomepageData(
       fetchHomepagePopularNews(),
       fetchHomepageForumNews(logFields),
       fetchHomepagePromoVideos(logFields),
-      fetchHomepageCategories(logFields),
+      fetchHomepageCategories(logFields, sectionPostsPromise),
     ])
 
   const postData = processSettledResult(

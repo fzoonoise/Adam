@@ -173,7 +173,7 @@ function Footer() {
         <Nextink
           href={item.href}
           target="_blank"
-          rel="noopener noreferrer external nofollow"
+          rel="noopener external nofollow"
         >
           {item.title}
         </Nextink>
@@ -187,7 +187,7 @@ function Footer() {
         <Nextink
           href={item.href}
           target="_blank"
-          rel="noopener noreferrer external nofollow"
+          rel="noopener external nofollow"
         >
           {item.title}
         </Nextink>
@@ -202,7 +202,7 @@ function Footer() {
           href={item.href}
           target="_blank"
           aria-label={item.name}
-          rel="noopener noreferrer external nofollow"
+          rel="noopener external nofollow"
         >
           <item.svgIcon />
         </Nextink>
@@ -242,7 +242,7 @@ function Footer() {
         <a
           href="https://developers.google.com/youtube/terms/developer-policies?hl=zh-tw#definition-youtube-api-services"
           target="_blank"
-          rel="noreferrer"
+          rel="noopener"
         >
           YouTube API 服務
         </a>
@@ -250,7 +250,7 @@ function Footer() {
         <a
           href="https://www.youtube.com/t/terms"
           target="_blank"
-          rel="noreferrer"
+          rel="noopener"
         >
           YouTube 服務條款
         </a>
@@ -258,7 +258,7 @@ function Footer() {
         <a
           href="https://policies.google.com/privacy"
           target="_blank"
-          rel="noreferrer"
+          rel="noopener"
         >
           Google 隱私權與條款
         </a>

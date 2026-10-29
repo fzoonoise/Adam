@@ -109,7 +109,7 @@ export default function ExternalPartnerPage({
               <PartnerArticles
                 externals={externals}
                 externalsCount={externalsCount}
-                from="author_list"
+                storyList="author_list"
                 partnerSlug={partner.slug}
                 renderPageSize={RENDER_PAGE_SIZE}
                 section={section}

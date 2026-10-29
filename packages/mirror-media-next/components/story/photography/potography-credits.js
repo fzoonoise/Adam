@@ -110,7 +110,7 @@ export default function Credits({ credits }) {
                   <li key={person.id} className="link">
                     <Link
                       target="_blank"
-                      rel="noreferrer noopenner"
+                      rel="noopenner"
                       href={`/author/${person.id}`}
                     >
                       {person.name}

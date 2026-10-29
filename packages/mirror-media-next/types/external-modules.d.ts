@@ -30,13 +30,54 @@ declare module '@mirrormedia/newebpay-node' {
 }
 
 declare module '@mirrormedia/lilith-draft-renderer/lib/website/mirrormedia' {
+  import type { ComponentType, ReactNode } from 'react'
+
   import type { Draft } from '@/type/draft-js'
+
+  // Only the props and draft-js methods `AnnotationBlock` actually reads.
+  type AnnotationBlockProps = {
+    children: ReactNode
+    contentLayout: string
+    entityKey: string
+    contentState: { getEntity: (key: string) => { getData: () => unknown } }
+  }
 
   const MirrorMedia: {
     hasContentInRawContentBlock: (content?: Draft | null) => boolean
+    entityDecorators: {
+      annotationDecorator: (contentLayout?: string) => {
+        strategy: unknown
+        component: ComponentType<AnnotationBlockProps>
+        props: { contentLayout: string }
+      }
+    }
   }
 
   export default MirrorMedia
+}
+
+declare module '@mirrormedia/lilith-draft-renderer/lib/website/mirrormedia/block-renderer-fn' {
+  import type { ComponentType, ReactNode } from 'react'
+
+  // Only the draft-js methods `AtomicBlock` and the block renderers call.
+  type DraftEntity = { getType: () => string; getData: () => unknown }
+  type AtomicBlockProps = {
+    block: { getEntityAt: (offset: number) => string }
+    contentState: { getEntity: (key: string) => DraftEntity }
+    blockProps: { contentLayout: string; firstImageAdComponent?: ReactNode }
+  }
+
+  // Returns `null` for non-atomic blocks; only the atomic case is typed since
+  // that's the only way it's called.
+  export function atomicBlockRenderer(
+    block: { getType: () => 'atomic' },
+    contentLayout: string,
+    firstImageAdComponent?: ReactNode
+  ): {
+    component: ComponentType<AtomicBlockProps>
+    editable: false
+    props: AtomicBlockProps['blockProps']
+  }
 }
 
 // The package ships its own `lib/types/index.d.ts`, but its package.json

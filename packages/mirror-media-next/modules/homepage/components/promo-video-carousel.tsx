@@ -39,7 +39,20 @@ const YOUTUBE_PLAYER_OPTIONS = {
   width: '100%',
 }
 
+const YOUTUBE_THUMBNAIL_QUALITIES = [
+  'maxresdefault',
+  'sddefault',
+  'hqdefault',
+] as const
+
 function VideoThumbnail({ onPlay, video }: VideoThumbnailProps) {
+  const [thumbnailQualityIndex, setThumbnailQualityIndex] = useState(0)
+  const handleThumbnailFallback = () => {
+    setThumbnailQualityIndex((current) =>
+      Math.min(current + 1, YOUTUBE_THUMBNAIL_QUALITIES.length - 1)
+    )
+  }
+
   return (
     <button
       aria-label={`播放影片：${video.title}`}
@@ -51,8 +64,15 @@ function VideoThumbnail({ onPlay, video }: VideoThumbnailProps) {
         alt=""
         className="object-cover"
         fill
+        onError={handleThumbnailFallback}
+        onLoad={(event) => {
+          if (event.currentTarget.naturalWidth <= 120) {
+            handleThumbnailFallback()
+          }
+        }}
         sizes="(min-width: 1280px) 340px, (min-width: 768px) 600px, calc(100vw - 64px)"
-        src={`https://i.ytimg.com/vi/${video.videoId}/hqdefault.jpg`}
+        src={`https://i.ytimg.com/vi/${video.videoId}/${YOUTUBE_THUMBNAIL_QUALITIES[thumbnailQualityIndex]}.jpg`}
+        unoptimized
       />
       <span
         aria-hidden="true"
@@ -237,6 +257,7 @@ function PromoVideoCarousel({ videos }: PromoVideoCarouselProps) {
                         </>
                       ) : (
                         <VideoThumbnail
+                          key={video.videoId}
                           onPlay={() => initializeVideo(video.id)}
                           video={video}
                         />

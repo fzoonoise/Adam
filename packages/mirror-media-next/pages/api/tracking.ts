@@ -7,7 +7,7 @@ import {
   GCP_PROJECT_ID,
   GCP_STACKDRIVER_LOG_NAME,
 } from '../../config/index.mjs'
-import { monitorLoggingRequestBody } from '../../utils/api/logging.schema'
+import { parseUserBehaviorLog } from '../../utils/api/logging.schema'
 
 const loggingClient =
   ENV === 'local'
@@ -22,18 +22,18 @@ export default async function handler(
 ) {
   try {
     res.send({ msg: 'Received.' })
-    monitorLoggingRequestBody('tracking', req.body)
 
-    if (!loggingClient) {
+    const query = parseUserBehaviorLog(req.body)
+
+    if (!loggingClient || !query) {
       return
     }
 
-    const query = req.body
     const log = loggingClient.log(GCP_STACKDRIVER_LOG_NAME)
     const metadata = { resource: { type: 'global' } }
     const clientIp = requestIp.getClientIp(req)
 
-    query.clientInfo.ip = clientIp
+    query.clientInfo.ip = clientIp ?? ''
 
     const entry = log.entry(metadata, query)
     await log.write(entry)

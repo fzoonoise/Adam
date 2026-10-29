@@ -1,30 +1,23 @@
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 
+import { AD_MEDIA_QUERIES } from '@/components/ads/ad-breakpoints'
+import { AD_SLOT_LAYOUTS } from '@/components/ads/ad-slot-layouts'
+import { CompassFitAd } from '@/components/ads/compass-fit/compass-fit-ad'
+import {
+  COMPASS_FIT_ARTICLE_SLOT_INDEXES,
+  COMPASS_FIT_UNITS,
+} from '@/components/ads/compass-fit/compass-fit-config'
+import { PrismAdSlot } from '@/components/ads/prism/prism-ad-slot'
+import { PRISM_ARTICLE_FURTHER_PLACEMENT } from '@/components/ads/prism/prism-config'
 import { cn } from '@/components/cn'
 import { ThemeElement } from '@/components/shell/article/theme-element'
 import { Typography } from '@/components/ui'
 import { DEFAULT_OG_IMAGE_URL } from '@/constants'
-import { MICRO_AD_UNITS } from '@/constants/ads'
 import useMediaQuery from '@/hooks/use-media-query'
 import { useDisplayAd } from '@/hooks/useDisplayAd'
 import type { ExternalRelatedStory } from '@/modules/external/external-types'
 
 import NextResponsiveImage from './next-responsive-image'
-
-const StyledMicroAd = dynamic(
-  () => import('@/components/ads/micro-ad/micro-ad-with-label'),
-  {
-    ssr: false,
-  }
-)
-
-const PopInAdInRelatedList = dynamic(
-  () => import('./pop-in-ad-in-related-list'),
-  {
-    ssr: false,
-  }
-)
 
 export function NextUpPosts({
   items,
@@ -33,9 +26,16 @@ export function NextUpPosts({
   items: ExternalRelatedStory[]
   hiddenAdvertised?: boolean
 }) {
-  const isDesktop = useMediaQuery(`(min-width: ${1280})`)
-  const device = isDesktop ? 'PC' : 'MB'
-  const { shouldShowAd } = useDisplayAd(hiddenAdvertised)
+  const {
+    isMediaQueryResolved: isArticleViewportResolved,
+    matches: isArticlePc,
+  } = useMediaQuery(AD_MEDIA_QUERIES.articleCompassFitPc)
+  const { isLoggedIn, isLogInProcessFinished, shouldShowAd } =
+    useDisplayAd(hiddenAdvertised)
+  const keepsAdSlots =
+    !hiddenAdvertised &&
+    !isLoggedIn &&
+    (!isLogInProcessFinished || shouldShowAd)
 
   if (items.length === 0) return null
 
@@ -62,7 +62,8 @@ export function NextUpPosts({
         {items.map((postItem) => (
           <li key={postItem.id} className="border-b border-b-black py-4">
             <Link
-              href={`/story/${postItem.slug}?from=referral_bottom`}
+              data-story-list="referral_bottom"
+              href={`/${postItem.type}/${postItem.slug}`}
               target="_blank"
               className={cn(
                 'grid grid-cols-[90px_1fr] items-center gap-x-4 md:grid-cols-[96px_1fr]',
@@ -109,16 +110,34 @@ export function NextUpPosts({
             </Link>
           </li>
         ))}
-        {shouldShowAd && (
+        {keepsAdSlots && (
           <>
-            {MICRO_AD_UNITS.STORY[device].map((unit) => (
-              <StyledMicroAd
-                key={unit.name}
-                unitId={unit.id}
-                microAdType="STORY"
+            {COMPASS_FIT_ARTICLE_SLOT_INDEXES.map((slotIndex) => {
+              const unitId = !isArticleViewportResolved
+                ? null
+                : COMPASS_FIT_UNITS.article[isArticlePc ? 'PC' : 'MB'][
+                    slotIndex
+                  ]
+
+              return (
+                <li className="min-w-0 py-4" key={`compass-fit-${slotIndex}`}>
+                  <CompassFitAd
+                    className={
+                      AD_SLOT_LAYOUTS.compassFit.articleFurtherRow.className
+                    }
+                    enabled={shouldShowAd}
+                    unitId={unitId}
+                  />
+                </li>
+              )
+            })}
+            <li className="min-w-0 py-4">
+              <PrismAdSlot
+                className={AD_SLOT_LAYOUTS.prism.articleFurtherRow.className}
+                enabled={shouldShowAd}
+                placement={PRISM_ARTICLE_FURTHER_PLACEMENT}
               />
-            ))}
-            <PopInAdInRelatedList />
+            </li>
           </>
         )}
       </ThemeElement>

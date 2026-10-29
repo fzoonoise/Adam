@@ -30,12 +30,7 @@ export default function SubBrandList({ subBrands = [], className }) {
     <SubBrandListWrapper className={className}>
       {subBrands.map(({ name, title, href, imageSize }) => (
         <ListItem key={name}>
-          <Link
-            href={href}
-            target="_blank"
-            rel="noopener noreferer"
-            aria-label={title}
-          >
+          <Link href={href} target="_blank" rel="noopener" aria-label={title}>
             <Image
               width={imageSize.normal.width}
               height={imageSize.normal.height}

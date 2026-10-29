@@ -36,6 +36,7 @@ type HomepageViewModel = {
 type HomepagePageProps = {
   headerData: ShellHeaderData
   homepageData: HomepageViewModel
+  isElectionPeriod: boolean
 }
 
 export type {

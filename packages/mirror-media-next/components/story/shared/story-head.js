@@ -7,6 +7,7 @@ import {
   getActiveOrderSection,
   hasUtmOrFbParamsInAsPath,
 } from '../../../utils'
+import { STORY_LIST_BOOTSTRAP_SCRIPT } from '../../../utils/gtm/story-list'
 // import Script from 'next/script'
 import { toTaipeiISOString } from '../../../utils/index'
 import DevGptAd from '../dev-gpt-ad'
@@ -112,6 +113,10 @@ export default function StoryHead({ postData }) {
   return (
     <>
       <Head>
+        <script
+          id="mm-story-list"
+          dangerouslySetInnerHTML={{ __html: STORY_LIST_BOOTSTRAP_SCRIPT }}
+        />
         <meta name="robots" content={robots} key="robots" />
         {!hasUtmOrFb && (
           <link rel="canonical" href={nonAmpUrl} key="canonical" />

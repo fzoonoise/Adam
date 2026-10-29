@@ -35,6 +35,7 @@ import {
   shellUtilityLinks,
 } from './navigation'
 import { ShellSearch } from './shell-search'
+import { useSetStickyLayout, useStickyHeader } from './sticky-header-context'
 import { useHorizontalWheelScroll } from './use-horizontal-wheel-scroll'
 
 const DesktopNavigationItem = dynamic(() =>
@@ -77,7 +78,8 @@ function SiteHeader({
   const { shouldShowAd } = useDisplayAd()
   const [headerAdStatus, setHeaderAdStatus] =
     useState<HeaderAdStatus>('pending')
-  const [showStickyControls, setShowStickyControls] = useState(false)
+  const { showStickyControls } = useStickyHeader()
+  const setStickyLayout = useSetStickyLayout()
   const categoryStripRef = useHorizontalWheelScroll()
   const [openFlyoutSlug, setOpenFlyoutSlug] = useState<string | null>(null)
   const [renderedFlyoutSlug, setRenderedFlyoutSlug] = useState<string | null>(
@@ -85,7 +87,6 @@ function SiteHeader({
   )
   const navigationRegionRef = useRef<HTMLDivElement | null>(null)
   const flashNewsRowRef = useRef<HTMLDivElement | null>(null)
-  const stickyOffsetsRef = useRef({ compact: 0, desktop: 0 })
   const logoRowRef = useRef<HTMLDivElement | null>(null)
   const navigation = createShellNavigation(navigationData, sectionPostsData)
   const openFlyoutItem = navigation.find(
@@ -114,31 +115,18 @@ function SiteHeader({
   useLayoutEffect(() => {
     const flashNewsRowHeight = flashNewsRowRef.current?.offsetHeight ?? 0
     const logoRowHeight = logoRowRef.current?.offsetHeight ?? 0
-
-    stickyOffsetsRef.current = {
-      compact: flashNewsRowHeight,
-      desktop: flashNewsRowHeight + logoRowHeight,
-    }
-  }, [hasFlashNewsRow])
-
-  useEffect(() => {
-    const desktop = window.matchMedia('(min-width: 1024px)')
-
-    function updateStickyState() {
-      const offsets = stickyOffsetsRef.current
-      setShowStickyControls(
-        window.scrollY >= (desktop.matches ? offsets.desktop : offsets.compact)
-      )
-    }
-
-    updateStickyState()
-    window.addEventListener('scroll', updateStickyState, { passive: true })
-    desktop.addEventListener('change', updateStickyState)
-    return () => {
-      window.removeEventListener('scroll', updateStickyState)
-      desktop.removeEventListener('change', updateStickyState)
-    }
-  }, [])
+    const navigationRowHeight = navigationRegionRef.current?.offsetHeight ?? 0
+    setStickyLayout({
+      compact: {
+        height: logoRowHeight + navigationRowHeight,
+        offset: flashNewsRowHeight,
+      },
+      desktop: {
+        height: navigationRowHeight,
+        offset: flashNewsRowHeight + logoRowHeight,
+      },
+    })
+  }, [hasFlashNewsRow, setStickyLayout])
 
   useEffect(() => {
     if (!openFlyoutSlug) {
@@ -340,7 +328,7 @@ function SiteHeader({
                   className={shellBrandLinkClass}
                   href={link.href}
                   key={link.label}
-                  rel="noopener noreferrer"
+                  rel="noopener"
                   target="_blank"
                 >
                   <Image

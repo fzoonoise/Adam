@@ -118,7 +118,6 @@ const DableAd = dynamic(() => import('@/components/common/dable-ad'), {
 })
 
 type StoryPageProps = {
-  query: Record<string, string | string[] | undefined> | null
   postData: StoryPost
   initialRelatedStories: RelatedStory[]
   headerData: ShellHeaderData
@@ -128,7 +127,6 @@ type StoryPageProps = {
 }
 
 export default function Story({
-  query,
   postData,
   initialRelatedStories = [],
   headerData,
@@ -189,7 +187,8 @@ export default function Story({
       <StoryHead postData={postData} />
       <PageShell
         head={{
-          robotsMetaContent: query?.from ? 'noindex' : null,
+          // StoryHead owns robots. utm/fbclid still noindex there.
+          robotsMetaContent: null,
           title: `${title ?? ''}`,
           ogTitle: postData.og_title ?? undefined,
           description:
@@ -229,6 +228,17 @@ export default function Story({
               relativeStory={firstRelativeStory}
               renderAdInContent={() => (
                 <GPT_Placeholder
+                  displayAt="desktop"
+                  rwd={{
+                    mobile: { width: '100%', height: 'auto', margin: '0' },
+                    tablet: { width: '100%', height: 'auto', margin: '0' },
+                    // 內文欄比預設 970px 窄，用滿寬才能把 640px 素材置中
+                    desktop: {
+                      width: '100%',
+                      height: 'auto',
+                      margin: '32px auto',
+                    },
+                  }}
                   shouldShowAd={shouldShowAd}
                   isLogInProcessFinished={isLogInProcessFinished}
                 >
@@ -236,11 +246,29 @@ export default function Story({
                     <GptAd
                       pageKey={pageKeyForGptAd}
                       adKey="PC_AT1"
-                      className="h-auto w-full"
+                      className="mx-auto block h-auto w-fit"
                     />
                   )}
                 </GPT_Placeholder>
               )}
+              renderMbAdInContent={(adKey) =>
+                shouldShowAd ? (
+                  <GptAd
+                    pageKey={pageKeyForGptAd}
+                    adKey={adKey}
+                    className="mt-8 h-auto w-full"
+                  />
+                ) : null
+              }
+              renderAdBelowRelated={() =>
+                shouldShowAd ? (
+                  <GptAd
+                    pageKey={pageKeyForGptAd}
+                    adKey="MB_AT3"
+                    className="order-10 col-span-full mx-[-20px] block h-auto w-full min-[336px]:mx-auto xl:hidden"
+                  />
+                ) : null
+              }
               renderAside={(summary) => (
                 <>
                   <GPT_Placeholder_Aside
@@ -272,7 +300,7 @@ export default function Story({
                         />
                       )}
                     </GPT_Placeholder_Aside>
-                    <PopularArticles />
+                    <PopularArticles placement="article" />
                     <ArticleQuestions
                       auto_faq={postData.auto_faq}
                       faqs_algo={postData.faqs_algo}
@@ -282,7 +310,12 @@ export default function Story({
                   </div>
                 </>
               )}
-              renderNextUp={() => <NextUpPosts items={restOfRelativeStories} />}
+              renderNextUp={() => (
+                <NextUpPosts
+                  hiddenAdvertised={hiddenAdvertised ?? false}
+                  items={restOfRelativeStories}
+                />
+              )}
               renderDable={() => (
                 <>
                   {shouldShowAd && (
@@ -309,13 +342,6 @@ export default function Story({
               )}
             />
 
-            {shouldShowAd && (
-              <GptAd
-                pageKey={pageKeyForGptAd}
-                adKey="MB_AT3"
-                className="mx-[-20px] block h-auto w-full min-[336px]:mx-auto xl:hidden"
-              />
-            )}
             {shouldShowAd && (
               <GptAd
                 pageKey={pageKeyForGptAd}
@@ -371,7 +397,7 @@ export default function Story({
 export const getServerSideProps: GetServerSideProps<
   StoryPageProps,
   { slug: string }
-> = async ({ params, query, req, res }) => {
+> = async ({ params, req, res }) => {
   if (ENV === 'prod') {
     setPageCache(
       res,
@@ -448,7 +474,6 @@ export const getServerSideProps: GetServerSideProps<
 
     return {
       props: {
-        query,
         postData: clientStoryPost,
         initialRelatedStories,
         headerData,

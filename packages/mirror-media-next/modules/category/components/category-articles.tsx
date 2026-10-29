@@ -9,28 +9,29 @@ import {
   fetchPostsByCategorySlug,
   fetchPremiumPostsByCategorySlug,
 } from '@/utils/api/category'
+import type { StoryList } from '@/utils/gtm/story-list'
 
 import { fetchNewsCategoryPostsJSON } from '../category-data'
 import type { CategorySummary } from '../category-types'
 
 type CategoryArticlesProps = {
   category: CategorySummary
-  from?: string
   isNewsCategory: boolean
   isPremium: boolean
   posts: ArticleListItemData[]
   postsCount: number
   renderPageSize: number
+  storyList?: StoryList
 }
 
 export default function CategoryArticles({
   category,
-  from,
   isNewsCategory,
   isPremium,
   posts,
   postsCount,
   renderPageSize,
+  storyList,
 }: CategoryArticlesProps) {
   const fetchPageSize = renderPageSize * 2
 
@@ -86,7 +87,7 @@ export default function CategoryArticles({
     >
       {(renderList) => (
         <ArticleList
-          from={from}
+          storyList={storyList}
           // `InfiniteScrollList` declares its render list as `Object[]`, a
           // JSDoc type in untyped JavaScript. Correcting it is a separate
           // change.

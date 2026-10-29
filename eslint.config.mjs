@@ -85,6 +85,7 @@ export default [
       'react/jsx-uses-react': 'error',
       'react/jsx-uses-vars': 'error',
       'react/no-unknown-property': 'error',
+      'react/jsx-no-target-blank': ['error', { allowReferrer: true }],
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       'simple-import-sort/imports': [
@@ -150,6 +151,7 @@ export default [
       'react/jsx-uses-react': 'error',
       'react/jsx-uses-vars': 'error',
       'react/no-unknown-property': 'error',
+      'react/jsx-no-target-blank': ['error', { allowReferrer: true }],
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       'simple-import-sort/imports': [

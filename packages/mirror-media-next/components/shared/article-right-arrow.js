@@ -43,11 +43,7 @@ export default function ArticleRightArrow({ relateds = [] }) {
   }
 
   return (
-    <StyledLink
-      href={firstRelated.url}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
+    <StyledLink href={firstRelated.url} target="_blank" rel="noopener">
       <ImageWrapper>
         <Image
           src={rightArrow}

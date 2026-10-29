@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 
-import { GCP_PROJECT_ID } from '../config/index.mjs'
+import { GCP_PROJECT_ID, SITE_URL } from '../config/index.mjs'
 
 /**
  * @typedef {{ id?: string | null, name?: string | null, slug?: string | null, state?: string | null } | null} SectionLike
@@ -448,6 +448,30 @@ const hasUtmOrFbParamsInAsPath = (asPath) => {
   }
 }
 
+/**
+ * Links from the CMS or from constants are hard-coded to the production
+ * domain regardless of which environment is currently serving the page, so
+ * this checks against the `mirrormedia.mg` domain family (not just the
+ * env-varying `SITE_URL`, which would otherwise misclassify production links
+ * as external when viewed on dev/staging). `SITE_URL` is also checked so
+ * relative paths and same-origin absolute urls resolve correctly for the
+ * current environment (e.g. a `localhost` link while running `pnpm dev`).
+ * @param {string} url
+ * @returns {boolean}
+ */
+const isInternalUrl = (url) => {
+  try {
+    const { hostname } = new URL(url, `https://${SITE_URL}`)
+    return (
+      hostname === SITE_URL ||
+      hostname === 'mirrormedia.mg' ||
+      hostname.endsWith('.mirrormedia.mg')
+    )
+  } catch {
+    return false
+  }
+}
+
 const isServer = () => {
   return typeof window === 'undefined' ? true : false
 }
@@ -505,6 +529,7 @@ export {
   getSectionSlugGql,
   hasUtmOrFbParamsInAsPath,
   isCompanyEmail,
+  isInternalUrl,
   isServer,
   isValidEmail,
   isValidPassword,

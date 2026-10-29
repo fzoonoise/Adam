@@ -201,7 +201,7 @@ export default function FlashNews({ flashNews = [] }) {
               key={item.id}
               href={`/story/${item.slug}`}
               target="_blank"
-              rel="noreferrer noopenner"
+              rel="noopenner"
             >
               <Title>快訊</Title>
               <p className="content"> {item?.title}</p>

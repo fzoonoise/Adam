@@ -1,3 +1,4 @@
+import type { parseUserBehaviorLog } from '../../api/logging.schema'
 import {
   getClientSideOnlyError,
   isServer,
@@ -13,7 +14,9 @@ import {
   type LogPageInfo,
 } from '../shared'
 
-type EventType = 'pageview' | 'exit' | 'scroll-to-80%' | 'click'
+type EventType = NonNullable<
+  ReturnType<typeof parseUserBehaviorLog>
+>['triggerEvent']['event-type']
 
 type UserBehaviorLogPayload = LogContextPayload & {
   writers?: string // Story writer.

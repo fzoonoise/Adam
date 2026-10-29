@@ -72,7 +72,7 @@ export default function PromoteTopicItem({ topic }) {
   const imagesWebP = topic.heroImage.resizedWebp ?? null
 
   return (
-    <Card href={`/topic/${topic.slug}`} target="_blank" rel="noreferrer">
+    <Card href={`/topic/${topic.slug}`} target="_blank">
       <ImageFrame>
         <CustomImage
           images={images}

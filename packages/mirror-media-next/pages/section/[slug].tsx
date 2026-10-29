@@ -86,7 +86,7 @@ export default function SectionPage({
           <div className="flex md:gap-10 xl:gap-6.5">
             <div className="mx-auto w-[calc(100%-464px)] max-w-187.5 flex-1 lg:mx-0">
               <SectionArticles
-                from="cate_list"
+                storyList="cate_list"
                 posts={posts}
                 postsCount={postsCount}
                 renderPageSize={RENDER_PAGE_SIZE}

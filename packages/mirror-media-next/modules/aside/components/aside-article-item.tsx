@@ -4,19 +4,24 @@ import { Link } from '@/components/ui/link'
 import { Typography } from '@/components/ui/typography'
 import { DEFAULT_OG_IMAGE_URL } from '@/constants'
 import { getArticleHref, transformTimeDataIntoDotFormat } from '@/utils'
+import type { StoryList } from '@/utils/gtm/story-list'
 
 import type { ArticleStyle, AsideArticle } from '../aside-types'
 
 type AsideArticleItemProps = {
   article: AsideArticle
-  from?: string
+  storyList?: StoryList
 }
 
-export function AsideArticleItem({ article, from }: AsideArticleItemProps) {
+export function AsideArticleItem({
+  article,
+  storyList,
+}: AsideArticleItemProps) {
   return (
     <Link
       className="flex items-center gap-mm-3xl hover:no-underline"
-      href={`${getArticleHref(
+      data-story-list={storyList}
+      href={getArticleHref(
         article.slug,
         // The JSON is not validated down to the style names, and only
         // 'campaign' and 'projects' change the href anyway.
@@ -28,9 +33,8 @@ export function AsideArticleItem({ article, from }: AsideArticleItemProps) {
           所以維持 空字串
          */
         ''
-      )}${from ? `?from=${from}` : ''}`}
+      )}
       target="_blank"
-      rel="noreferrer"
     >
       <div className="relative h-[114px] w-40 shrink-0">
         <Image

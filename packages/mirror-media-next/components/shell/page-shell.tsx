@@ -8,6 +8,7 @@ import { BackToTop } from './back-to-top'
 import { SiteFooter } from './footer/site-footer'
 import type { SiteHeaderProps } from './header/site-header'
 import { SiteHeader } from './header/site-header'
+import { StickyHeaderProvider } from './header/sticky-header-context'
 import { IdleTimeoutModal } from './idle-timeout-modal/idle-timeout-modal'
 
 type PageShellProps = {
@@ -28,7 +29,7 @@ function PageShell({
   withIdleTimeout = true,
 }: PageShellProps) {
   return (
-    <>
+    <StickyHeaderProvider>
       <CustomHead {...head} />
       <div
         className="flex min-h-dvh w-full flex-col"
@@ -50,7 +51,7 @@ function PageShell({
         {withFooter ? <SiteFooter /> : null}
         <BackToTop />
       </div>
-    </>
+    </StickyHeaderProvider>
   )
 }
 

@@ -33,6 +33,7 @@ function ArticleImage({
       priority={priority}
       sizes={sizes}
       src={imageSrc}
+      unoptimized
     />
   )
 }

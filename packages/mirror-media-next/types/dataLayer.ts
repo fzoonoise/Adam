@@ -157,6 +157,8 @@ export const DATA_LAYER_DIMENSION_KEYS = [
   'cat_1',
   'story_title',
   'content_slug',
+  /** 點擊列表後由瀏覽器帶入，不進 SSR dataLayer。換頁時沒有值會清成 undefined。 */
+  'story_list',
   'publication_date',
   'content_author',
   'content_tag',

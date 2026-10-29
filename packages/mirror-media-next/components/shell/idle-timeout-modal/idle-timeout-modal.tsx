@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Dialog } from '@base-ui/react'
 import axios from 'axios'
@@ -12,7 +12,7 @@ import { API_TIMEOUT, URL_STATIC_POPULAR_NEWS } from '@/config/index.mjs'
 import { IDLE_MODAL_LINK } from '@/constants'
 import { CUSTOMER_SERVICE_INFOS } from '@/constants/footer'
 import { useIdleTimeout } from '@/hooks/use-idle-timeout'
-import useClickOutside from '@/hooks/useClickOutside'
+import { isInternalUrl } from '@/utils'
 
 const IDLE_TIMEOUT = 60 * 2 * 1000 // 2 minutes in milliseconds
 
@@ -29,12 +29,7 @@ function IdleTimeoutModal({
 }: IdleTimeoutModalProps) {
   const [isIdle, setIsIdle] = useIdleTimeout(IDLE_TIMEOUT)
   const [popularNews, setPopularNews] = useState<PopularNewsApiPost[]>([])
-  const modalRef = useRef<HTMLDivElement>(null)
   useCarouselTickerPause(pauseCarouselTicker && isIdle)
-
-  useClickOutside(modalRef, () => {
-    handleClose()
-  })
 
   useEffect(() => {
     if (popularNews.length) return
@@ -63,10 +58,11 @@ function IdleTimeoutModal({
   return (
     <Dialog.Root open={isIdle} onOpenChange={setIsIdle}>
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed top-0 left-0 z-(--mm-z-shell-top) h-screen w-screen bg-black/50" />
-        <Dialog.Viewport className="fixed top-1/2 left-1/2 z-(--mm-z-shell-top) w-full -translate-x-1/2 -translate-y-1/2">
-          <Dialog.Popup>
-            <div className="mx-auto w-full max-w-90 bg-white px-4 py-6 xl:max-w-200 xl:scale-[clamp(70%,calc(100vh/768px*100%),100%)] xl:px-21.5 xl:pt-13">
+        <Dialog.Backdrop className="fixed inset-0 z-(--mm-z-shell-top) bg-black/50" />
+        {/* Viewport 只負責置中。pointer-events 留給 Backdrop，點白卡以外才會關閉。 */}
+        <Dialog.Viewport className="pointer-events-none fixed inset-0 z-(--mm-z-shell-top) overflow-y-auto">
+          <div className="flex min-h-full w-full items-center justify-center">
+            <Dialog.Popup className="pointer-events-auto w-full max-w-90 bg-white px-4 py-6 xl:max-w-200 xl:scale-[clamp(70%,calc(100vh/768px*100%),100%)] xl:px-21.5 xl:pt-13">
               <div className="relative">
                 <div className="flex flex-col gap-y-3 pb-3 xl:flex-row xl:justify-between xl:pb-0">
                   <Image
@@ -105,8 +101,12 @@ function IdleTimeoutModal({
                         key={index}
                         href={link.href}
                         target="_blank"
-                        rel="noreferrer"
                         className="grow-1"
+                        rel={
+                          isInternalUrl(link.href)
+                            ? 'noopener'
+                            : 'noopener noreferrer'
+                        }
                       >
                         <Typography variant="h6" className="text-mm-base-500">
                           {link.title}
@@ -138,8 +138,8 @@ function IdleTimeoutModal({
                   })}
                 </div>
               </div>
-            </div>
-          </Dialog.Popup>
+            </Dialog.Popup>
+          </div>
         </Dialog.Viewport>
       </Dialog.Portal>
     </Dialog.Root>

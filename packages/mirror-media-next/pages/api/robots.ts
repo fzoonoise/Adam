@@ -11,18 +11,23 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       Disallow: /subscribe/*
       Disallow: /search/*
       Disallow: /_next/data/*
+      Disallow: /api/tracking
 
       User-agent: facebookexternalhit
         Allow: /
+        Disallow: /api/tracking
 
       User-agent: Facebot
         Allow: /
+        Disallow: /api/tracking
 
       User-agent: Meta-ExternalAgent
         Allow: /
+        Disallow: /api/tracking
       
       User-agent: *
         Allow: /
+        Disallow: /api/tracking
       
       Sitemap: https://www.mirrormedia.mg/rss/posts.xml
       Sitemap: https://www.mirrormedia.mg/rss/posts-news.xml

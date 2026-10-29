@@ -60,7 +60,6 @@ export default function AmpRelated({ relateds, gptSlotSection }) {
           href={`/story/${relatedItem.slug}`}
           target="_blank"
           key={index}
-          rel="noreferrer"
         >
           {relatedItem.title}
         </RelatedItem>
@@ -74,7 +73,6 @@ export default function AmpRelated({ relateds, gptSlotSection }) {
               href={`/story/${relatedItem.slug}`}
               target="_blank"
               key={index}
-              rel="noreferrer"
             >
               {relatedItem.title}
             </RelatedItem>

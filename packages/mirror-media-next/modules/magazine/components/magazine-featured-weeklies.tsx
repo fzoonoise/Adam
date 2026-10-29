@@ -25,7 +25,7 @@ export default function MagazineFeaturedWeeklies({
           <Link
             className="group block hover:no-underline"
             href={getMagazineHrefFromSlug(magazine.slug) ?? '/magazine'}
-            rel="noopener noreferrer"
+            rel="noopener"
             target="_blank"
             variant="plain"
           >

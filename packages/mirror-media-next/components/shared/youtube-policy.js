@@ -51,7 +51,7 @@ export default function YoutubePolicy() {
       <a
         href="https://www.mirrormedia.mg/story/privacy/"
         target="_blank"
-        rel="noopener noreferrer"
+        rel="noopener"
       >
         隱私權政策
       </a>

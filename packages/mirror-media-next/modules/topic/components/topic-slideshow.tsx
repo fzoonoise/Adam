@@ -100,11 +100,7 @@ function TopicSlideshow({ images }: TopicSlideshowProps) {
         {images.map((item) => (
           <SwiperSlide key={item.id}>
             {item.topicKeywords?.startsWith('@-') ? (
-              <NextLink
-                href={item.topicKeywords.slice(2)}
-                rel="noreferrer"
-                target="_blank"
-              >
+              <NextLink href={item.topicKeywords.slice(2)} target="_blank">
                 <CustomImage
                   alt={item.name ?? ''}
                   defaultImage={DEFAULT_OG_IMAGE_URL}

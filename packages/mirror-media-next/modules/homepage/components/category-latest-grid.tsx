@@ -46,7 +46,8 @@ function CategoryLatestGrid({ categories }: CategoryLatestGridProps) {
                       'group grid grid-cols-[108px_minmax(0,1fr)] gap-mm-3xl',
                       homepageCardLinkFocusClass
                     )}
-                    href={`${featuredArticle.href}?from=index_cate_news`}
+                    data-story-list="index_cate_news"
+                    href={featuredArticle.href}
                   >
                     <span className="relative block h-[77px] w-[108px] overflow-hidden bg-mm-neutral-100">
                       <ArticleImage
@@ -68,7 +69,8 @@ function CategoryLatestGrid({ categories }: CategoryLatestGridProps) {
                 {otherArticles.slice(0, 2).map((article) => (
                   <NextLink
                     className={cn('group block', homepageCardLinkFocusClass)}
-                    href={`${article.href}?from=index_cate_news`}
+                    data-story-list="index_cate_news"
+                    href={article.href}
                     key={article.key}
                   >
                     <Typography

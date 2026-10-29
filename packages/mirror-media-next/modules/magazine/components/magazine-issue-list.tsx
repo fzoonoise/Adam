@@ -24,7 +24,7 @@ function MagazineLink({ children, href }: MagazineLinkProps) {
     <Link
       className="group block hover:no-underline"
       href={href || '/magazine'}
-      rel={href ? 'noopener noreferrer' : undefined}
+      rel={href ? 'noopener' : undefined}
       target={href ? '_blank' : undefined}
       variant="plain"
     >

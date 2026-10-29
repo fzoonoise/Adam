@@ -5,14 +5,15 @@ import { Link } from '@/components/ui/link'
 import { Typography } from '@/components/ui/typography'
 import { DEFAULT_OG_IMAGE_URL } from '@/constants'
 import { transformTimeDataIntoDotFormat } from '@/utils'
+import type { StoryList } from '@/utils/gtm/story-list'
 
 import type { ArticleListItemData } from '../list-article-types'
 
 type LeadArticleProps = {
   className?: string
-  from?: string
   item: ArticleListItemData
   priority?: boolean
+  storyList?: StoryList
 }
 
 /**
@@ -22,22 +23,22 @@ type LeadArticleProps = {
  */
 export function LeadArticle({
   className,
-  from,
   item,
   priority,
+  storyList,
 }: LeadArticleProps) {
   const sectionName = item.sections?.[0]?.name
 
   return (
     <Link
       className={cn('relative block hover:no-underline', className)}
-      href={`${
+      data-story-list={storyList}
+      href={
         item.type === 'external'
           ? `/external/${item.slug}`
           : `/story/${item.slug}`
-      }${from ? `?from=${from}` : ''}`}
+      }
       target="_blank"
-      rel="noreferrer"
     >
       <div className="relative aspect-[330/220] w-full sm:aspect-[112/80]">
         <Image
@@ -63,8 +64,8 @@ export function LeadArticle({
 
       <Typography
         as="h2"
-        variant="subtitle"
-        className="mt-mm-l mb-mm-l line-clamp-2 text-mm-neutral-800 sm:mb-0 sm:text-mm-h5 sm:text-[rgba(0,0,0,0.87)]"
+        variant="h5"
+        className="mt-mm-l mb-1.25 line-clamp-2 text-mm-neutral-800 sm:mb-0 sm:text-[rgba(0,0,0,0.87)]"
       >
         {item.title}
       </Typography>

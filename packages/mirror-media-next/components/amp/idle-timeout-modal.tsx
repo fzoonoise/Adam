@@ -215,12 +215,7 @@ export default function IdleTimeoutModal() {
             <LinksWrapper>
               {IDLE_MODAL_LINK.map((link, index) => {
                 return (
-                  <LinkItem
-                    key={index}
-                    href={link.href}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  <LinkItem key={index} href={link.href} target="_blank">
                     {link.title}
                   </LinkItem>
                 )

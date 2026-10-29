@@ -18,7 +18,7 @@ export function LatestArticles({ sectionSlug }: LatestArticlesProps) {
   return (
     <AsideArticleList
       fetchFunc={fetchFunc}
-      from="cate_newnews"
+      storyList="cate_newnews"
       title="最新文章"
     />
   )

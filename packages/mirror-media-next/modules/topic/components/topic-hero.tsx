@@ -28,7 +28,6 @@ function TopicHero({ slideshowImages, topic }: TopicHeroProps) {
           aria-label={topic.name}
           className="absolute inset-0"
           href={topic.heroUrl}
-          rel="noreferrer"
           target="_blank"
         />
       ) : null}

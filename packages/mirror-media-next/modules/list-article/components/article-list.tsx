@@ -1,14 +1,18 @@
 import { Fragment } from 'react'
 import dynamic from 'next/dynamic'
 
-import { useBreakpoint } from '@/hooks/use-breakpoint'
-import useWindowDimensions from '@/hooks/use-window-dimensions'
-import { useDisplayAd } from '@/hooks/useDisplayAd'
+import { AD_MEDIA_QUERIES } from '@/components/ads/ad-breakpoints'
+import { AD_SLOT_LAYOUTS } from '@/components/ads/ad-slot-layouts'
+import { CompassFitAd } from '@/components/ads/compass-fit/compass-fit-ad'
 import {
-  getMicroAdUnitId,
-  getSectionGPTPageKey,
-  needInsertMicroAdAfter,
-} from '@/utils/ad'
+  COMPASS_FIT_UNITS,
+  getCompassFitSlotIndex,
+} from '@/components/ads/compass-fit/compass-fit-config'
+import { cn } from '@/components/cn'
+import useMediaQuery from '@/hooks/use-media-query'
+import { useDisplayAd } from '@/hooks/useDisplayAd'
+import { getSectionGPTPageKey } from '@/utils/ad'
+import type { StoryList } from '@/utils/gtm/story-list'
 
 import type {
   ArticleListItemData,
@@ -22,21 +26,50 @@ const GPTAd = dynamic(() => import('@/components/ads/gpt/gpt-ad'), {
   ssr: false,
 })
 
-const MicroAd = dynamic(
-  () => import('./micro-ad').then((module) => module.MicroAd),
-  { ssr: false }
-)
-
 type ArticleListProps = {
-  from?: string
   renderList: ArticleListItemData[]
   section?: ArticleListSection
+  storyList?: StoryList
 }
 
-export function ArticleList({ from, renderList, section }: ArticleListProps) {
-  const { shouldShowAd } = useDisplayAd()
-  const { width } = useWindowDimensions()
-  const smBreakpoint = useBreakpoint('sm')
+type ListingMobileCompassFitSlotProps = {
+  enabled: boolean
+  unitId: string
+}
+
+function ListingMobileCompassFitSlot({
+  enabled,
+  unitId,
+}: ListingMobileCompassFitSlotProps) {
+  return (
+    <div className="relative min-w-0 sm:hidden">
+      {/*
+        Match the responsive article geometry: a 3:2 image, two subtitle
+        lines (37px), title margins (24px), and one caption line (21px).
+      */}
+      <div aria-hidden="true" className="invisible">
+        <div className="aspect-[330/220] w-full" />
+        <div className="mt-mm-l mb-mm-l h-[37px]" />
+        <div className="h-[21px]" />
+      </div>
+      <CompassFitAd
+        className="absolute inset-0 h-full"
+        enabled={enabled}
+        unitId={unitId}
+      />
+    </div>
+  )
+}
+
+export function ArticleList({
+  renderList,
+  section,
+  storyList,
+}: ArticleListProps) {
+  const { isLoggedIn, isLogInProcessFinished, shouldShowAd } = useDisplayAd()
+  const keepsAdSlots = !isLoggedIn && (!isLogInProcessFinished || shouldShowAd)
+  const { isMediaQueryResolved: isListingViewportResolved, matches: isSmUp } =
+    useMediaQuery(AD_MEDIA_QUERIES.listingLayoutSm)
 
   /**
    * 這個元件會被共用於 author/tag/category 列表頁
@@ -50,41 +83,33 @@ export function ArticleList({ from, renderList, section }: ArticleListProps) {
   const leadArticles = renderList.slice(0, 3)
   const articlesAfterLead = renderList.slice(3)
 
-  /**
-   * 領頭的那幾篇在 Tailwind `sm` 以下會渲染成一般的列表列，此時整頁是一串連續的
-   * 列表，特企的位置要從第一篇開始算，所以它們也要參與計算、列表區的 index 要補上
-   * 被切走的三篇。`width` 和 `smBreakpoint` 在首次 client render 前都是 undefined，
-   * 但廣告要等 `shouldShowAd`（登入流程跑完）才會出現，不會早於它們。
-   */
-  const isMobile =
-    width !== undefined && smBreakpoint !== undefined && width < smBreakpoint
-
-  const renderListWithAd = shouldShowAd
-    ? articlesAfterLead.slice(0, 6)
-    : articlesAfterLead.slice(0, 9)
-
-  const renderListWithoutAd = shouldShowAd
-    ? articlesAfterLead.slice(6)
-    : articlesAfterLead.slice(9)
+  const renderListWithAd = articlesAfterLead.slice(0, 6)
+  const renderListWithoutAd = articlesAfterLead.slice(6)
 
   return (
     <>
       <div className="mb-mm-2xl space-y-mm-2xl sm:flex sm:gap-7 sm:space-y-0 sm:bg-mm-neutral-100 sm:px-[16.5px] sm:py-[27.5px]">
         {leadArticles.map((item, index) => {
-          const microAdUnitId =
-            shouldShowAd && isMobile && needInsertMicroAdAfter(index)
-              ? getMicroAdUnitId(index, 'LISTING', 'RWD')
-              : null
+          const mobileSlotIndex = index === 1 ? 0 : null
 
           return (
             <Fragment key={item.id}>
               <LeadArticle
                 className="sm:min-w-0 sm:flex-1"
-                from={from}
+                storyList={storyList}
                 item={item}
                 priority={index === 0}
               />
-              {microAdUnitId && <MicroAd unitId={microAdUnitId} />}
+              {keepsAdSlots && mobileSlotIndex !== null && (
+                <ListingMobileCompassFitSlot
+                  enabled={
+                    shouldShowAd &&
+                    isListingViewportResolved &&
+                    isSmUp === false
+                  }
+                  unitId={COMPASS_FIT_UNITS.listing[mobileSlotIndex]}
+                />
+              )}
             </Fragment>
           )
         })}
@@ -93,24 +118,42 @@ export function ArticleList({ from, renderList, section }: ArticleListProps) {
       <div className="max-w-180">
         <div className="space-y-mm-2xl">
           {renderListWithAd.map((item, index) => {
-            const adIndex = isMobile ? index + leadArticles.length : index
-            // `getMicroAdUnitId` returns null when the slot has no unit, which
-            // the ad component cannot render.
-            const microAdUnitId =
-              shouldShowAd && needInsertMicroAdAfter(adIndex)
-                ? getMicroAdUnitId(adIndex, 'LISTING', 'RWD')
-                : null
+            const mobileSlotIndex = index === 0 ? 1 : index === 2 ? 2 : null
+            const nonMobileSlotIndex = getCompassFitSlotIndex(index)
 
             return (
               <Fragment key={item.id}>
-                <ArticleListItem from={from} item={item} />
-                {microAdUnitId && <MicroAd unitId={microAdUnitId} />}
+                <ArticleListItem storyList={storyList} item={item} />
+                {keepsAdSlots && mobileSlotIndex !== null && (
+                  <ListingMobileCompassFitSlot
+                    enabled={
+                      shouldShowAd &&
+                      isListingViewportResolved &&
+                      isSmUp === false
+                    }
+                    unitId={COMPASS_FIT_UNITS.listing[mobileSlotIndex]}
+                  />
+                )}
+                {keepsAdSlots && nonMobileSlotIndex !== null && (
+                  <CompassFitAd
+                    className={cn(
+                      'hidden sm:block',
+                      AD_SLOT_LAYOUTS.compassFit.listingNonMobileRow.className
+                    )}
+                    enabled={
+                      shouldShowAd &&
+                      isListingViewportResolved &&
+                      isSmUp === true
+                    }
+                    unitId={COMPASS_FIT_UNITS.listing[nonMobileSlotIndex]}
+                  />
+                )}
               </Fragment>
             )
           })}
         </div>
 
-        {shouldShowAd && (
+        {!isLoggedIn && shouldShowAd && (
           <GPTAd
             adKey="MB_FT"
             className="mx-auto my-mm-2xl h-auto w-full xl:my-[35px]"
@@ -120,7 +163,7 @@ export function ArticleList({ from, renderList, section }: ArticleListProps) {
 
         <div className="mt-mm-2xl space-y-mm-2xl">
           {renderListWithoutAd.map((item) => (
-            <ArticleListItem key={item.id} from={from} item={item} />
+            <ArticleListItem key={item.id} storyList={storyList} item={item} />
           ))}
         </div>
       </div>

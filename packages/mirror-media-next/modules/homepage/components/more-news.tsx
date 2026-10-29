@@ -1,13 +1,19 @@
-import { Fragment, useEffect, useRef, useState } from 'react'
-import dynamic from 'next/dynamic'
+import { useEffect, useRef, useState } from 'react'
 import NextLink from 'next/link'
 
+import { AD_MEDIA_QUERIES } from '@/components/ads/ad-breakpoints'
+import { CompassFitAd } from '@/components/ads/compass-fit/compass-fit-ad'
+import {
+  COMPASS_FIT_HOMEPAGE_ITEM_INDEXES,
+  COMPASS_FIT_UNITS,
+  getHomepageCompassFitSlotIndex,
+} from '@/components/ads/compass-fit/compass-fit-config'
 import { cn } from '@/components/cn'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { Typography } from '@/components/ui/typography'
+import useMediaQuery from '@/hooks/use-media-query'
 import { useDisplayAd } from '@/hooks/useDisplayAd'
-import { getMicroAdUnitId, needInsertMicroAdAfter } from '@/utils/ad'
 
 import { fetchMoreHomepageNews } from '../homepage-client-data'
 import { HOMEPAGE_DESKTOP_MEDIA_QUERY } from '../homepage-constants'
@@ -17,19 +23,24 @@ import { ArticleImage } from './article-image'
 import { homepageCardLinkFocusClass } from './homepage-card-styles'
 import { SectionTitle } from './section-title'
 
-const MicroAd = dynamic(
-  () => import('@/components/ads/micro-ad/micro-ad-with-label-homepage'),
-  { ssr: false }
-)
-
-const LEGACY_HOME_MICRO_AD_PC_MEDIA_QUERY = '(min-width: 768px)'
-
 type MoreNewsProps = {
   excludedKeys: string[]
   initialArticles: HomepageArticle[]
   initialHasMore: boolean
-  onBeforeAppend?: () => void
 }
+
+type MoreNewsGridItem =
+  | {
+      article: HomepageArticle
+      itemKey: string
+      type: 'article'
+    }
+  | {
+      article: HomepageArticle
+      itemKey: string
+      slotIndex: number
+      type: 'ad'
+    }
 
 const focusViewportTop = 64
 const minimumVisibleFocusHeight = 40
@@ -58,13 +69,13 @@ function MoreNews({
   excludedKeys,
   initialArticles,
   initialHasMore,
-  onBeforeAppend,
 }: MoreNewsProps) {
+  const initialArticleCountRef = useRef(initialArticles.length)
   const [articles, setArticles] = useState(initialArticles)
-  const [device, setDevice] = useState<'MB' | 'PC'>('MB')
   const [errorMessage, setErrorMessage] = useState('')
   const [focusArticleKey, setFocusArticleKey] = useState<string | null>(null)
   const [hasMore, setHasMore] = useState(initialHasMore)
+  const [hasLoadedMore, setHasLoadedMore] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [statusAnnouncement, setStatusAnnouncement] = useState('')
   const endStatusRef = useRef<HTMLSpanElement | null>(null)
@@ -74,15 +85,79 @@ function MoreNews({
   const requestInFlightRef = useRef(false)
   const shouldFocusEndStatusRef = useRef(false)
   const shouldRestoreFocusRef = useRef(false)
-  const { shouldShowAd } = useDisplayAd()
+  const { isLogInProcessFinished, shouldShowAd } = useDisplayAd()
+  const {
+    isMediaQueryResolved: isHomepageViewportResolved,
+    matches: isHomepagePc,
+  } = useMediaQuery(AD_MEDIA_QUERIES.homepageCompassFitPc)
+  const reservesAdSlots = !isLogInProcessFinished || shouldShowAd
+  const initialArticleCount = initialArticleCountRef.current
+  const initialBatchArticles = articles.slice(0, initialArticleCount)
+  const appendedArticles = articles.slice(initialArticleCount)
+  const carryOverArticleCount = Math.min(
+    COMPASS_FIT_HOMEPAGE_ITEM_INDEXES.length,
+    initialBatchArticles.length
+  )
+  const initialCarryOverArticles = carryOverArticleCount
+    ? initialBatchArticles.slice(-carryOverArticleCount)
+    : []
+  const initialVisibleArticles = carryOverArticleCount
+    ? initialBatchArticles.slice(0, -carryOverArticleCount)
+    : initialBatchArticles
+  // Put the previous batch's tail first in the next batch (下一批), then
+  // carry the newest tail forward without rearranging visible cards.
+  const appendedArticlePool =
+    reservesAdSlots && hasLoadedMore
+      ? [...initialCarryOverArticles, ...appendedArticles]
+      : appendedArticles
+  const visibleAppendedArticles =
+    reservesAdSlots && hasLoadedMore && hasMore && carryOverArticleCount
+      ? appendedArticlePool.slice(0, -carryOverArticleCount)
+      : appendedArticlePool
+  const initialGridItems = reservesAdSlots
+    ? initialBatchArticles.flatMap<MoreNewsGridItem>(
+        (sizingArticle, itemIndex) => {
+          const slotIndex = getHomepageCompassFitSlotIndex(itemIndex)
+          if (slotIndex !== null) {
+            return [
+              {
+                article: sizingArticle,
+                itemKey: `initial-${itemIndex}`,
+                slotIndex,
+                type: 'ad',
+              },
+            ]
+          }
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia(LEGACY_HOME_MICRO_AD_PC_MEDIA_QUERY)
-    const updateDevice = () => setDevice(mediaQuery.matches ? 'PC' : 'MB')
-    updateDevice()
-    mediaQuery.addEventListener('change', updateDevice)
-    return () => mediaQuery.removeEventListener('change', updateDevice)
-  }, [])
+          const precedingSlotCount = COMPASS_FIT_HOMEPAGE_ITEM_INDEXES.filter(
+            (slotItemIndex) => slotItemIndex < itemIndex
+          ).length
+          const article = initialVisibleArticles[itemIndex - precedingSlotCount]
+
+          return article
+            ? [
+                {
+                  article,
+                  itemKey: `initial-${itemIndex}`,
+                  type: 'article',
+                },
+              ]
+            : []
+        }
+      )
+    : initialBatchArticles.map<MoreNewsGridItem>((article, itemIndex) => ({
+        article,
+        itemKey: `initial-${itemIndex}`,
+        type: 'article',
+      }))
+  const gridItems: MoreNewsGridItem[] = [
+    ...initialGridItems,
+    ...visibleAppendedArticles.map((article) => ({
+      article,
+      itemKey: `appended-${article.key}`,
+      type: 'article' as const,
+    })),
+  ]
 
   useEffect(() => {
     if (isLoading) return
@@ -117,7 +192,9 @@ function MoreNews({
   }, [focusArticleKey, isLoading])
 
   async function handleLoadMore() {
-    if (requestInFlightRef.current || !hasMore) return
+    if (requestInFlightRef.current || !hasMore || !isLogInProcessFinished) {
+      return
+    }
 
     requestInFlightRef.current = true
     shouldFocusEndStatusRef.current = false
@@ -127,6 +204,14 @@ function MoreNews({
     setStatusAnnouncement('')
 
     try {
+      const deferredArticlesBeforeLoad =
+        shouldShowAd && carryOverArticleCount
+          ? hasLoadedMore
+            ? [...initialCarryOverArticles, ...appendedArticles].slice(
+                -carryOverArticleCount
+              )
+            : initialCarryOverArticles
+          : []
       const existingKeys = [
         ...excludedKeys,
         ...articles.map((article) => article.key),
@@ -137,15 +222,20 @@ function MoreNews({
       )
 
       nextFileNumberRef.current = result.nextFileNumber
-      if (result.articles.length) onBeforeAppend?.()
+      const newlyVisibleArticleCount =
+        result.articles.length +
+        (!result.hasMore ? deferredArticlesBeforeLoad.length : 0)
       setArticles((current) => current.concat(result.articles))
       setHasMore(result.hasMore)
-      setFocusArticleKey(result.articles[0]?.key ?? null)
+      setHasLoadedMore(true)
+      setFocusArticleKey(
+        deferredArticlesBeforeLoad[0]?.key ?? result.articles[0]?.key ?? null
+      )
       shouldFocusEndStatusRef.current =
-        !result.articles.length && !result.hasMore
+        !newlyVisibleArticleCount && !result.hasMore
       const announcements: string[] = []
-      if (result.articles.length) {
-        announcements.push(`已載入 ${result.articles.length} 則新聞。`)
+      if (newlyVisibleArticleCount) {
+        announcements.push(`已載入 ${newlyVisibleArticleCount} 則新聞。`)
       }
       if (!result.hasMore) announcements.push('目前沒有更多新聞。')
       setStatusAnnouncement(announcements.join(' '))
@@ -169,69 +259,101 @@ function MoreNews({
 
       {articles.length > 0 ? (
         <div className="mt-mm-3xl grid grid-cols-1 gap-y-mm-3xl md:grid-cols-2 md:gap-x-mm-5xl md:gap-y-mm-2xl xl:grid-cols-3 xl:gap-x-mm-l">
-          {articles.map((article, index) => {
-            const microAdUnitId = getMicroAdUnitId(index, 'HOME', device)
+          {gridItems.map((item) => {
+            // Keep the article card in normal flow (一般排版流) as the ad
+            // slot's size contract (尺寸契約).
+            const { article, itemKey } = item
+            const reservesAdSlot = item.type === 'ad'
+            const unitId =
+              item.type !== 'ad' || !isHomepageViewportResolved
+                ? null
+                : COMPASS_FIT_UNITS.homepage[isHomepagePc ? 'PC' : 'MB'][
+                    item.slotIndex
+                  ]
 
             return (
-              <Fragment key={article.key}>
-                <article className="h-full min-w-0">
-                  <NextLink
-                    className={cn(
-                      'GTM-homepage-latest-list group flex h-full flex-col',
-                      homepageCardLinkFocusClass
-                    )}
-                    href={`${article.href}?from=index_list_news`}
-                    ref={
-                      article.key === focusArticleKey
-                        ? firstAppendedArticleRef
-                        : undefined
-                    }
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    <span className="relative block aspect-3/2 w-full overflow-hidden bg-mm-neutral-100">
-                      <ArticleImage
-                        alt={article.title}
-                        sizes="(min-width: 1280px) 235px, (min-width: 768px) 332px, calc(100vw - 32px)"
-                        src={article.imageUrl}
-                      />
-                      {article.sectionName && (
-                        <span className="absolute top-0 left-0 flex h-6 items-center rounded-br-mm-xs bg-mm-base-600 px-mm-l font-mm-sans text-mm-subtitle text-mm-second-100">
-                          {article.sectionName}
-                        </span>
-                      )}
-                    </span>
-                    <Typography
-                      as="h3"
-                      className="mt-mm-m line-clamp-2 min-h-[3em] text-mm-neutral-800 group-hover:underline md:mt-mm-l"
-                      variant="h6"
-                    >
-                      {article.title}
-                    </Typography>
-                    {article.publishedDate && (
+              <div className="relative h-full min-w-0" key={itemKey}>
+                <article
+                  aria-hidden={reservesAdSlot || undefined}
+                  className="h-full min-w-0"
+                >
+                  {reservesAdSlot ? (
+                    <div className="invisible flex h-full flex-col">
+                      <span className="relative block aspect-3/2 w-full overflow-hidden bg-mm-neutral-100" />
                       <Typography
-                        as="time"
-                        className="mt-mm-m block text-mm-neutral-400 md:mt-mm-l"
-                        dateTime={article.publishedDate}
-                        variant="caption-l"
+                        as="span"
+                        className="mt-mm-m block min-h-[3em] md:mt-mm-l md:text-mm-h6"
+                        variant="h5"
                       >
-                        {formatPublishedDate(article.publishedDate)}
+                        &nbsp;
                       </Typography>
-                    )}
-                  </NextLink>
+                      {article.publishedDate && (
+                        <Typography
+                          as="span"
+                          className="mt-mm-m block md:mt-mm-l"
+                          variant="caption-l"
+                        >
+                          &nbsp;
+                        </Typography>
+                      )}
+                    </div>
+                  ) : (
+                    <NextLink
+                      className={cn(
+                        'GTM-homepage-latest-list group flex h-full flex-col',
+                        homepageCardLinkFocusClass
+                      )}
+                      data-story-list="index_list_news"
+                      href={article.href}
+                      ref={
+                        article.key === focusArticleKey
+                          ? firstAppendedArticleRef
+                          : undefined
+                      }
+                      rel="noopener"
+                      target="_blank"
+                    >
+                      <span className="relative block aspect-3/2 w-full overflow-hidden bg-mm-neutral-100">
+                        <ArticleImage
+                          alt={article.title}
+                          sizes="(min-width: 1280px) 235px, (min-width: 768px) 332px, calc(100vw - 32px)"
+                          src={article.imageUrl}
+                        />
+                        {article.sectionName && (
+                          <span className="absolute top-0 left-0 flex h-6 items-center rounded-br-mm-xs bg-mm-base-600 px-mm-l font-mm-sans text-mm-subtitle text-mm-second-100">
+                            {article.sectionName}
+                          </span>
+                        )}
+                      </span>
+                      <Typography
+                        as="h3"
+                        className="mt-mm-m line-clamp-2 min-h-[3em] text-mm-neutral-800 group-hover:underline md:mt-mm-l md:text-mm-h6"
+                        variant="h5"
+                      >
+                        {article.title}
+                      </Typography>
+                      {article.publishedDate && (
+                        <Typography
+                          as="time"
+                          className="mt-mm-m block text-mm-neutral-400 md:mt-mm-l"
+                          dateTime={article.publishedDate}
+                          variant="caption-l"
+                        >
+                          {formatPublishedDate(article.publishedDate)}
+                        </Typography>
+                      )}
+                    </NextLink>
+                  )}
                 </article>
 
-                {shouldShowAd &&
-                  needInsertMicroAdAfter(index) &&
-                  microAdUnitId && (
-                    <div
-                      className="min-w-0 overflow-hidden"
-                      data-homepage-micro-ad
-                    >
-                      <MicroAd microAdType="HOME" unitId={microAdUnitId} />
-                    </div>
-                  )}
-              </Fragment>
+                {reservesAdSlot && (
+                  <CompassFitAd
+                    className="absolute inset-0 h-full"
+                    enabled={shouldShowAd}
+                    unitId={unitId}
+                  />
+                )}
+              </div>
             )
           })}
         </div>
@@ -244,6 +366,7 @@ function MoreNews({
       {hasMore && (
         <Button
           className="mt-mm-3xl w-full py-0 text-mm-h5"
+          disabled={!isLogInProcessFinished}
           isLoading={isLoading}
           onClick={handleLoadMore}
           ref={loadMoreButtonRef}

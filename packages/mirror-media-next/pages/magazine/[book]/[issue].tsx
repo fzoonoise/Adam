@@ -1,3 +1,5 @@
+import type { ComponentProps } from 'react'
+import { useEffect } from 'react'
 import type { GetServerSideProps } from 'next'
 import type { ParsedUrlQuery } from 'querystring'
 import { z } from 'zod'
@@ -5,6 +7,7 @@ import { z } from 'zod'
 import client from '@/apollo/apollo-client'
 import { fetchWeeklies } from '@/apollo/query/magazines'
 import Layout from '@/components/shared/layout'
+import { useStickyHeader } from '@/components/shell/header/sticky-header-context'
 import MagazineViewer from '@/modules/magazine/components/magazine-viewer'
 import type { WeeklyMagazine } from '@/modules/magazine/magazine-types'
 import { getLogTraceObject } from '@/utils'
@@ -29,6 +32,27 @@ type MagazineViewerPageProps = Record<string, unknown> & {
   weeklies: WeeklyMagazine[]
 }
 
+// Its own component so it renders inside Layout: StickyHeaderProvider lives in
+// PageShell, and the page component that renders Layout sits above it, so
+// reading the context there only gets the default value.
+function MagazineReader({
+  book,
+  issue,
+  weeklies,
+}: ComponentProps<typeof MagazineViewer>) {
+  const { stickyOffset } = useStickyHeader()
+
+  // Scroll to where the site header collapses, so its full height no longer
+  // covers the iframe and swallows clicks meant for the magazine.
+  useEffect(() => {
+    if (stickyOffset) {
+      window.scrollTo({ top: stickyOffset })
+    }
+  }, [book, issue, stickyOffset])
+
+  return <MagazineViewer book={book} issue={issue} weeklies={weeklies} />
+}
+
 export default function MagazineViewerPage({
   book,
   headerData,
@@ -41,7 +65,7 @@ export default function MagazineViewerPage({
       header={{ type: 'default', data: headerData }}
       withFooter={false}
     >
-      <MagazineViewer book={book} issue={issue} weeklies={weeklies} />
+      <MagazineReader book={book} issue={issue} weeklies={weeklies} />
     </Layout>
   )
 }

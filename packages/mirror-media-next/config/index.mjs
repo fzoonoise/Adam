@@ -14,6 +14,8 @@ const GOOGLE_SHEETS_PRIVATE_KEY = (
 const GOOGLE_SHEETS_CLIENT_EMAIL = process.env.GOOGLE_SHEETS_CLIENT_EMAIL
 const GOOGLE_SHEETS_CLIENT_ID = process.env.GOOGLE_SHEETS_CLIENT_ID
 const GOOGLE_SHEET_SLOT_ID = process.env.GOOGLE_SHEET_SLOT_ID
+const WEEKLY_START_TS = process.env.WEEKLY_START_TS ?? ''
+const WEEKLY_END_TS = process.env.WEEKLY_END_TS ?? ''
 const MISO_API_BASE_URL = 'https://api.askmiso.com'
 const MISO_ENDPOINTS = {
   relatedStories: `${MISO_API_BASE_URL}/v1/recommendation/product_to_products`,
@@ -422,4 +424,6 @@ export {
   URL_STATIC_TOPICS,
   WEEKLY_API_SERVER_ORIGIN,
   WEEKLY_API_SERVER_YOUTUBE_ENDPOINT,
+  WEEKLY_END_TS,
+  WEEKLY_START_TS,
 }

@@ -11,7 +11,7 @@ type DableAdProps = {
 }
 
 export default function DableAd({ breakpoint, className }: DableAdProps) {
-  const isDesktopWidth = useMediaQuery(minWidth[breakpoint])
+  const { matches: isDesktopWidth } = useMediaQuery(minWidth[breakpoint])
 
   return (
     <>

@@ -90,7 +90,7 @@ export default function Header() {
   return (
     <Nav>
       <LogoWrapper>
-        <a href="/" target="_blank" rel="noreferrer noopenner">
+        <a href="/" target="_blank" rel="noopenner">
           <Image
             src="/images-next/weekly-logo-white.svg"
             alt="mirror media logo"

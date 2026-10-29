@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 /** The breakpoints exposed to JS in `styles/tailwind.css`. */
-type BreakpointName = 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+export type BreakpointName = 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 
 /**
  * Reads a Tailwind breakpoint in px, so in JS can use the same value

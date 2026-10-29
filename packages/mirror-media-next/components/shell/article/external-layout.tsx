@@ -1,10 +1,9 @@
 import { useMemo } from 'react'
 import Image from 'next/image'
-import NextImage from 'next/image'
 import { CircleDollarSignIcon } from 'lucide-react'
 
 import { Badge, Link, Typography } from '@/components/ui'
-import { SITE_URL } from '@/config/index.mjs'
+import { SITE_BASE_PATH, SITE_URL } from '@/config/index.mjs'
 import type {
   ExternalPost,
   ExternalRelatedStory,
@@ -40,22 +39,22 @@ type ExternalLayoutProps = Pick<
 
 const actionList = [
   {
-    resource: '/images/sns-line.svg',
+    resource: `${SITE_BASE_PATH}/images/sns-line.svg`,
     label: '加入',
     href: 'https://lin.ee/dkD1s4q',
   },
   {
-    resource: '/images/sns-ig.svg',
+    resource: `${SITE_BASE_PATH}/images/sns-ig.svg`,
     label: '追蹤',
     href: 'https://www.instagram.com/mirror_media/',
   },
   {
-    resource: '/images/yt.svg',
+    resource: `${SITE_BASE_PATH}/images/yt.svg`,
     label: '訂閱',
     href: 'https://www.youtube.com/channel/UCYkldEK001GxR884OZMFnRw?sub_confirmation=1',
   },
   {
-    resource: '/images/sns-mm.png',
+    resource: `${SITE_BASE_PATH}/images/sns-mm.png`,
     label: '下載',
     href: 'https://www.mirrormedia.mg/story/20161228corpmkt001/?utm_source=magzine&utm_campaign=mm_app_download&utm_medium=qrcode',
   },
@@ -108,7 +107,7 @@ export function ExternalLayout(props: ExternalLayoutProps) {
   }, [content])
 
   return (
-    <div className="max-w-7xl pt-4 md:mx-6 md:grid-cols-12 xl:mx-auto xl:grid xl:grid-cols-[repeat(12,minmax(0,1fr))_424px] xl:gap-x-14">
+    <div className="max-w-7xl pt-4 md:mx-6 md:grid-cols-12 lg:px-10 xl:mx-auto xl:grid xl:grid-cols-[repeat(12,minmax(0,1fr))_424px] xl:gap-x-14">
       <article className="relative grid-cols-subgrid space-y-7 gap-x-0 xl:col-span-12 xl:grid xl:grid-rows-[repeat(5,min-content)_auto]">
         <div className="order-1 col-span-full flex items-center justify-center md:col-span-3 md:justify-start xl:col-span-3">
           <Link href="/">
@@ -148,11 +147,11 @@ export function ExternalLayout(props: ExternalLayoutProps) {
           {title}
         </Typography>
         <PublicDate
-          className="order-3 col-span-full ml-2 md:col-span-6 xl:col-span-5"
+          className="order-3 col-span-full ml-2 md:col-span-6 xl:col-span-7"
           publishedDate={publishedDate}
           updatedAt={updatedAt}
         />
-        <div className="sticky top-27 z-1 order-4 col-span-full flex justify-around gap-x-3 bg-white p-2 md:static md:col-start-8 md:justify-end md:py-0">
+        <div className="sticky top-27 z-1 order-4 col-span-full flex items-start justify-around gap-x-3 bg-white p-2 md:static md:col-start-8 md:justify-end md:py-0">
           <IconLink
             href="https://google.com/preferences/source?q=mirrormedia.mg"
             className="flex h-7 items-center rounded-full border px-1.5 py-1 md:gap-1 md:px-2.5"
@@ -160,7 +159,7 @@ export function ExternalLayout(props: ExternalLayoutProps) {
             <Image
               width={14}
               height={14}
-              src="/images/google-logo.svg"
+              src={`${SITE_BASE_PATH}/images/google-logo.svg`}
               alt="google-logo"
             />
             <ThemeElement
@@ -172,7 +171,7 @@ export function ExternalLayout(props: ExternalLayoutProps) {
           </IconLink>
           <IconLink
             href={`https://www.facebook.com/share.php?u=${canonicalUrl}`}
-            src="/images/fb-logo.svg"
+            src={`${SITE_BASE_PATH}/images/fb-logo.svg`}
             alt="facebook-logo"
             rel="noopener noreferrer"
             target="_blank"
@@ -180,7 +179,7 @@ export function ExternalLayout(props: ExternalLayoutProps) {
           />
           <IconLink
             href={`https://social-plugins.line.me/lineit/share?u=${canonicalUrl}`}
-            src="/images/line-logo.svg"
+            src={`${SITE_BASE_PATH}/images/line-logo.svg`}
             alt="line-logo"
             rel="noopener noreferrer"
             target="_blank"
@@ -197,7 +196,7 @@ export function ExternalLayout(props: ExternalLayoutProps) {
             <Image
               width={28}
               height={28}
-              src="/images/threads-logo.svg"
+              src={`${SITE_BASE_PATH}/images/threads-logo.svg`}
               alt="threads-logo"
               className="scale-70 transform invert-100"
             />
@@ -213,10 +212,10 @@ export function ExternalLayout(props: ExternalLayoutProps) {
               </ThemeElement>
             )}
           >
-            <NextImage
+            <Image
               width={28}
               height={28}
-              src="/images/link-logo.svg"
+              src={`${SITE_BASE_PATH}/images/link-logo.svg`}
               alt="link-logo"
             />
           </CopyLinkButton>
@@ -229,6 +228,7 @@ export function ExternalLayout(props: ExternalLayoutProps) {
                 src={thumb}
                 alt={thumbCaption ?? title ?? ''}
                 fetchPriority="high"
+                unoptimized
               />
             </picture>
             {thumbCaption && (
@@ -250,7 +250,7 @@ export function ExternalLayout(props: ExternalLayoutProps) {
                 <Link
                   className="text-mm-base-700 underline"
                   target="_blank"
-                  rel="noreferrer noopener"
+                  rel="noopener"
                   href={`/externals/${partner.slug}`}
                 >
                   {getCreditsHtml(credits)}
@@ -282,9 +282,8 @@ export function ExternalLayout(props: ExternalLayoutProps) {
               key={`tag-${tag?.name ?? index}`}
               href={`/tag/${tag?.slug}`}
               target="_blank"
-              rel="noreferrer"
             >
-              <Badge>{tag?.name}</Badge>
+              <Badge className="text-mm-h6">{tag?.name}</Badge>
             </Link>
           ))}
         </div>
@@ -298,7 +297,7 @@ export function ExternalLayout(props: ExternalLayoutProps) {
             <Link
               href="/donate"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener"
               className="inline-flex items-center gap-x-1 rounded-full border-mm-base-700 bg-mm-base-700 px-3 py-2 hover:bg-mm-base-600"
             >
               <CircleDollarSignIcon className="size-4 text-white" />
@@ -312,7 +311,7 @@ export function ExternalLayout(props: ExternalLayoutProps) {
             <Link
               href="/subscribe"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener"
               className="inline-flex"
             >
               <Typography

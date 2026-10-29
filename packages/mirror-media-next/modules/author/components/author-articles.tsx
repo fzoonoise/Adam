@@ -6,21 +6,22 @@ import { toArticleListItemData } from '@/modules/list-article/list-article-data'
 import type { ArticleListItemData } from '@/modules/list-article/list-article-types'
 import LoadingPage from '@/public/images-next/loading_page.gif'
 import { fetchPostsByAuthorId } from '@/utils/api/author'
+import type { StoryList } from '@/utils/gtm/story-list'
 
 type AuthorArticlesProps = {
   authorId: string
-  from?: string
   posts: ArticleListItemData[]
   postsCount: number
   renderPageSize: number
+  storyList?: StoryList
 }
 
 export default function AuthorArticles({
   authorId,
-  from,
   posts,
   postsCount,
   renderPageSize,
+  storyList,
 }: AuthorArticlesProps) {
   const fetchPageSize = renderPageSize * 2
 
@@ -63,7 +64,7 @@ export default function AuthorArticles({
     >
       {(renderList) => (
         <ArticleList
-          from={from}
+          storyList={storyList}
           // `InfiniteScrollList` declares its render list as `Object[]`, a
           // JSDoc type in untyped JavaScript. Correcting it is a separate
           // change.

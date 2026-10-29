@@ -104,7 +104,7 @@ export default function TagPage({
             {/* The sidebar is gone below lg, so the column centres itself. */}
             <div className="mx-auto w-[calc(100%-464px)] max-w-187.5 flex-1 lg:mx-0">
               <TagArticles
-                from="tagging_list"
+                storyList="tagging_list"
                 posts={posts}
                 postsCount={postsCount}
                 renderPageSize={RENDER_PAGE_SIZE}

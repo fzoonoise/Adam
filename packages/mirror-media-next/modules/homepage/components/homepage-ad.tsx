@@ -41,7 +41,7 @@ function HomepageAdPlaceholder({
 function HomepageAd({ placement, wrapperClassName }: HomepageAdProps) {
   const [device, setDevice] = useState<'MB' | 'PC' | null>(null)
   const [slotStatus, setSlotStatus] = useState<AdSlotStatus>('pending')
-  const { shouldShowAd } = useDisplayAd()
+  const { isLoggedIn, isLogInProcessFinished, shouldShowAd } = useDisplayAd()
   const isLocalPreview = ENV === 'local'
   const canShowPreview = ENV !== 'prod'
 
@@ -60,6 +60,8 @@ function HomepageAd({ placement, wrapperClassName }: HomepageAdProps) {
       setSlotStatus(event.isEmpty ? 'empty' : 'filled'),
     []
   )
+
+  if (isLoggedIn || (isLogInProcessFinished && !shouldShowAd)) return null
 
   const requestDevice = !isLocalPreview && shouldShowAd ? device : null
   const shouldShowPlaceholder =

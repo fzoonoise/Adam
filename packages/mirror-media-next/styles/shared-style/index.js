@@ -2,8 +2,8 @@ import { css } from 'styled-components'
 
 const defaultSansSerifFontFamily = css`
   font-family:
-    'PingFang TC',
     'Noto Sans TC',
+    'PingFang TC',
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
