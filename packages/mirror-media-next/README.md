@@ -414,6 +414,7 @@ ref: https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html#cas
 | FIREBASE_ADMIN_CREDENTIAL   | 字串(JSON) | ''                        | Firebase 專案所屬服務帳號的密鑰資訊，參考：[Initialize the SDK in non-Google environments#To generate a private key file for your service account](https://firebase.google.com/docs/admin/setup#initialize_the_sdk_in_non-google_environments) |
 | NEWEBPAY_PAPERMAG_KEY       | 字串       | `'newebpay-papermag-key'` | 藍新商店 key                                                                                                                                                                                                                                   |
 | NEWEBPAY_PAPERMAG_IV        | 字串       | `'newebpay-papermag-iv'`  | 藍新商店 iv                                                                                                                                                                                                                                    |
+| INTERNAL_API_KEY            | 字串       | `''`                      | 僅伺服器執行期讀取；紙本訂單建立與付款回站查詢呼叫會員代理時使用。須與會員後端設定相符，不得改為 `NEXT_PUBLIC_` 變數或送到瀏覽器；預覽模式不傳至 CMS                                                                                           |
 | GOOGLE_SHEETS_PRIVATE_KEY   | 字串(JSON) | `''`                      | 呼叫 google sheet API 所使用的 service account token 資訊                                                                                                                                                                                      |
 | GOOGLE_SHEETS_CLIENT_EMAIL  | 字串       | `undefined`               | 呼叫 google sheet API 所使用的 service account 名稱                                                                                                                                                                                            |
 | GOOGLE_SHEETS_CLIENT_ID     | 字串       | `undefined`               | 呼叫 google sheet API 所使用的 service account ID                                                                                                                                                                                              |
@@ -422,7 +423,7 @@ ref: https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html#cas
 | GCS_FUSE_MOUNT_DIR          | 字串       | `/statics`                | Server-side static JSON 的 GCS FUSE mount path                                                                                                                                                                                                 |
 | GCS_FUSE_STATIC_BUCKET      | 字串       | 依 `NEXT_PUBLIC_ENV` 決定 | GCS FUSE static bucket 名稱                                                                                                                                                                                                                    |
 
-提醒：新增的環境變數若在 dev/prod 環境無法正常讀取， 須到 GCP (Google Cloud Platform) 的編輯觸發條件更新替代變數
+公開建置變數須透過 Cloud Build（雲端建置服務）與 Docker 建置參數傳入；`INTERNAL_API_KEY` 等伺服器執行期變數則設定在 Cloud Run（雲端容器服務）的執行環境或機密參照，僅新增建置替代變數不會自動傳入執行中的服務。
 
 ## Environment Variables for search only (Search 限定的環境變數)
 

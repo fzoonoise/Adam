@@ -70,7 +70,8 @@ async function fireGqlRequest(
 }
 
 async function getPaymentDataOfMagazineOrders(
-  variables: FetchPaymentDataOfPapermagMutationVariables
+  variables: FetchPaymentDataOfPapermagMutationVariables,
+  returnUrl?: string
 ): Promise<PaymentDataOfMagazineOrders> {
   const { data } = await fireGqlRequest(fetchPaymentDataOfPapermag, variables)
   const tradeInfo = data?.createNewebpayTradeInfoForMagazineOrder
@@ -82,9 +83,10 @@ async function getPaymentDataOfMagazineOrders(
     createNewebpayTradeInfoForMagazineOrder: {
       ...tradeInfo,
       ReturnURL:
-        ENV === 'local'
+        returnUrl ??
+        (ENV === 'local'
           ? `http://localhost:3000/papermag/return`
-          : `https://${SITE_URL}/papermag/return`,
+          : `https://${SITE_URL}/papermag/return`),
       CREDIT: 1,
       Version: '2.2',
     },
@@ -111,7 +113,14 @@ export default async function EncryptInfo(
     const variables: FetchPaymentDataOfPapermagMutationVariables = {
       data: paymentInput,
     }
-    const data = await getPaymentDataOfMagazineOrders(variables)
+    // TODO(P7): Remove this temporary dev-v4 override before promoting P7 to dev.
+    // Match only this fixed host; never build a return URL from request headers.
+    const returnUrl =
+      ENV === 'dev' &&
+      req.headers.host?.toLowerCase() === 'dev-v4.mirrormedia.mg'
+        ? 'https://dev-v4.mirrormedia.mg/papermag/return'
+        : undefined
+    const data = await getPaymentDataOfMagazineOrders(variables, returnUrl)
     const infoForNewebpay = data.createNewebpayTradeInfoForMagazineOrder
 
     const itemCode = paymentInput.merchandise.connect.code
