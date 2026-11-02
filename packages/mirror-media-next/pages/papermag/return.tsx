@@ -207,7 +207,14 @@ export const getServerSideProps: GetServerSideProps<ReturnPageProps> = async ({
     const merchantOrderNumber = getMerchantOrderNumber(decryptedTradeInfo)
     const result = await client.query({
       query: fetchAllMemberByOrderNo,
-      context: { uri: '/member/graphql' },
+      context: {
+        uri: '/member/graphql',
+        headers: {
+          // getServerSideProps only: the proxy attaches the member session
+          // for internal-key callers so the fresh order can be looked up.
+          'X-Internal-Api-Key': process.env.INTERNAL_API_KEY ?? '',
+        },
+      },
       variables: { orderNumber: merchantOrderNumber },
     })
     const order = result.data?.magazineOrders?.[0]

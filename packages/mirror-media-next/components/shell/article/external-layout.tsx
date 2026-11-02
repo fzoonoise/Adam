@@ -83,7 +83,12 @@ export function ExternalLayout(props: ExternalLayoutProps) {
   const canonicalUrl = `https://${SITE_URL}/external/${slug}`
 
   const sectionTitle = getExternalSectionTitle(partner)
-  const displayTags = [...(tags ?? []), ...(tags_algo ?? [])]
+  const seenTagSlugs = new Set<string | null | undefined>()
+  const displayTags = [...(tags ?? []), ...(tags_algo ?? [])].filter((tag) => {
+    if (seenTagSlugs.has(tag?.slug)) return false
+    seenTagSlugs.add(tag?.slug)
+    return true
+  })
   const credits = extend_byline ?? ''
 
   const updatedContent = useMemo(() => {
@@ -279,7 +284,7 @@ export function ExternalLayout(props: ExternalLayoutProps) {
         <div className="order-9 col-span-full mx-8 flex flex-wrap gap-2">
           {displayTags.map((tag, index) => (
             <Link
-              key={`tag-${tag?.name ?? index}`}
+              key={`tag-${tag?.slug ?? index}`}
               href={`/tag/${tag?.slug}`}
               target="_blank"
             >

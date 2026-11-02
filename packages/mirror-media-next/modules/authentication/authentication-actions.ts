@@ -122,12 +122,18 @@ const createMemberDataInIsrafel = async (
  * @throws {Error} Throws an error if the GraphQL query fails or if certain member data is not found.
  */
 const fetchBasicMemberInfoInIsrafel = async (
-  firebaseUid: string
+  firebaseUid: string,
+  accessToken: AccessToken
 ): Promise<void> => {
   try {
     const result = await client.query({
       query: fetchAllMember,
-      context: { uri: '/member/graphql' },
+      context: {
+        uri: '/member/graphql',
+        headers: {
+          authorization: accessToken ? `Bearer ${accessToken}` : '',
+        },
+      },
       variables: {
         firebaseId: firebaseUid,
       },
@@ -166,7 +172,7 @@ const loginPageOnAuthStateChangeAction = async (
     await createMemberDataInIsrafel(accessToken, userEmail, userUid)
     return FormState.RegisterSuccess
   } else {
-    await fetchBasicMemberInfoInIsrafel(userUid)
+    await fetchBasicMemberInfoInIsrafel(userUid, accessToken)
     return FormState.LoginSuccess
   }
 }

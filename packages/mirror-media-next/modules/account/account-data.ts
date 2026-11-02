@@ -13,8 +13,8 @@ const fetchAccountProfile = async (
     variables: { firebaseId },
     context: {
       uri: '/member/graphql',
-      header: {
-        authorization: accessToken,
+      headers: {
+        authorization: accessToken ? `Bearer ${accessToken}` : '',
       },
     },
   })
