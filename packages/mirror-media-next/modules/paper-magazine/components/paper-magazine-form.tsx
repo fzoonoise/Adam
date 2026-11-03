@@ -87,6 +87,16 @@ const carrierOptions: CarrierOption[] = [
   { id: 2, name: '電子發票載具' },
 ]
 
+const donateSelectItems = donateOptions.map((option) => ({
+  value: String(option.code),
+  label: option.name,
+}))
+
+const carrierSelectItems = carrierOptions.map((option) => ({
+  value: String(option.id),
+  label: option.name,
+}))
+
 function SectionHeading({ children }: { children: string }) {
   return (
     <Typography as="h2" className="font-medium" variant="h3">
@@ -549,6 +559,7 @@ function ReceiptSection({
 
       {option === RECEIPT_OPTION.DONATE && (
         <Select<string>
+          items={donateSelectItems}
           modal={false}
           value={donateOption ? String(donateOption.code) : null}
           onValueChange={(value) => {
@@ -578,6 +589,7 @@ function ReceiptSection({
       {option === RECEIPT_OPTION.WITH_CARRIER && (
         <>
           <Select<string>
+            items={carrierSelectItems}
             modal={false}
             value={carrierOption ? String(carrierOption.id) : null}
             onValueChange={(value) => {
