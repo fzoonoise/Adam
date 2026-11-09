@@ -1,10 +1,6 @@
 import { useEffect } from 'react'
 import { FirebaseError } from 'firebase/app'
-import {
-  fetchSignInMethodsForEmail,
-  getAdditionalUserInfo,
-  getRedirectResult,
-} from 'firebase/auth'
+import { getAdditionalUserInfo, getRedirectResult } from 'firebase/auth'
 
 import { FirebaseAuthError } from '@/constants/firebase'
 import { auth } from '@/firebase'
@@ -16,12 +12,7 @@ import {
   errorHandler,
   loginPageOnAuthStateChangeAction,
 } from '../authentication-actions'
-import {
-  AuthMethod,
-  FormState,
-  loginActions,
-  loginState,
-} from '../authentication-state'
+import { FormState, loginActions, loginState } from '../authentication-state'
 import useRedirect from '../use-authentication-redirect'
 
 import LoginFailed from './login-failed'
@@ -32,21 +23,6 @@ import WebviewHint from './webview-hint'
 
 type LoginPageContentProps = {
   isWebview: boolean
-}
-
-const getPreviousAuthMethod = (providerId?: string): string => {
-  switch (providerId) {
-    case 'google.com':
-      return AuthMethod.Google
-    case 'facebook.com':
-      return AuthMethod.Facebook
-    case 'apple.com':
-      return AuthMethod.Apple
-    case 'password':
-      return AuthMethod.Email
-    default:
-      return providerId ?? AuthMethod.Default
-  }
 }
 
 export default function LoginPageContent({ isWebview }: LoginPageContentProps) {
@@ -79,17 +55,7 @@ export default function LoginPageContent({ isWebview }: LoginPageContentProps) {
           error.code ===
             FirebaseAuthError.ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL
         ) {
-          const email =
-            typeof error.customData?.email === 'string'
-              ? error.customData.email
-              : ''
-          const signInMethods = await fetchSignInMethodsForEmail(auth, email)
-
-          dispatch(
-            loginActions.changePrevAuthMethod(
-              getPreviousAuthMethod(signInMethods[0])
-            )
-          )
+          dispatch(loginActions.goToStart())
           dispatch(
             loginActions.changeShouldShowHintOfExistenceOfDifferentAuthMethod(
               true

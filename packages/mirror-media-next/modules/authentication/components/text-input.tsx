@@ -28,7 +28,7 @@ export default function GenericTextInput({
   onChange,
 }: GenericTextInputProps) {
   return (
-    <div className="flex w-full flex-col gap-2">
+    <div className="flex w-full flex-col">
       <Input
         type="text"
         value={value}
@@ -37,11 +37,13 @@ export default function GenericTextInput({
         onChange={onChange}
         hasError={state === InputState.Invalid}
       />
-      {getHint(state, {
-        incompleteMessage,
-        invalidMessage,
-        validMessage,
-      })}
+      <div className="flex min-h-10 items-center py-2">
+        {getHint(state, {
+          incompleteMessage,
+          invalidMessage,
+          validMessage,
+        })}
+      </div>
     </div>
   )
 }

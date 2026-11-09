@@ -4,14 +4,12 @@ import CenteredHint from './centered-input-hint'
 import Hint from './input-hint'
 
 const DEFAULT = 'default'
-const NOT_REGISTERED = 'not-registered'
 const ERROR = 'error'
 const IN_PROGRESS = 'in-progress'
 const SUCCESS = 'success'
 
 export const HINT_STATE = {
   DEFAULT,
-  NOT_REGISTERED,
   ERROR,
   IN_PROGRESS,
   SUCCESS,
@@ -34,15 +32,6 @@ export default function Hints({ state }: HintsProps) {
           正在寄出信件...
         </Hint>
       )
-    case NOT_REGISTERED:
-      return (
-        <Hint
-          state={InputState.Invalid}
-          className="self-center text-center text-base"
-        >
-          這個 Email 尚未註冊
-        </Hint>
-      )
     case ERROR:
       return (
         <Hint
@@ -59,7 +48,7 @@ export default function Hints({ state }: HintsProps) {
             state={InputState.Valid}
             className="self-center text-center text-base"
           >
-            Email 已成功寄出
+            若此信箱可重設密碼，您將收到重設密碼郵件。
           </Hint>
           <CenteredHint state={InputState.Incomplete}>
             沒收到信嗎？請檢查垃圾信件匣，或等候 30 秒重新寄送

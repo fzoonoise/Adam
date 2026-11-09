@@ -9,11 +9,13 @@ import StyledLink from './styled-link'
 type GenericFailedProps = {
   primaryText: string
   onBack: MouseEventHandler<HTMLButtonElement>
+  onLogin?: MouseEventHandler<HTMLButtonElement>
 }
 
 export default function GenericFailed({
   primaryText,
   onBack,
+  onLogin,
 }: GenericFailedProps) {
   return (
     <main className="flex flex-col items-center">
@@ -37,7 +39,10 @@ export default function GenericFailed({
           </StyledLink>{' '}
           / 致電 (02)6633-3966 由專人為您服務。
         </Typography>
-        <DefaultButton onClick={onBack}>回上一步</DefaultButton>
+        <div className="flex flex-col gap-3">
+          <DefaultButton onClick={onBack}>回上一步</DefaultButton>
+          {onLogin && <DefaultButton onClick={onLogin}>前往登入</DefaultButton>}
+        </div>
       </FormWrapper>
     </main>
   )

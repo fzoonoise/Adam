@@ -8,6 +8,7 @@ import IconReveal from '@/public/images-next/login/reveal.svg'
 import { InputState, type InputStateEnum } from '../authentication-form'
 
 import getHint from './get-input-hint'
+import Hint from './input-hint'
 
 type GenericPasswordInputProps = {
   id?: string
@@ -17,6 +18,8 @@ type GenericPasswordInputProps = {
   incompleteMessage?: string // 輸入未完成的提示
   invalidMessage?: string // 輸入錯誤的提示
   validMessage?: string // 輸入正確的提示
+  showInvalidBorder?: boolean
+  reservedHintMessage?: string
   onChange: ChangeEventHandler<HTMLInputElement> // 輸入值變動處理
 }
 
@@ -28,12 +31,14 @@ export default function GenericPasswordInput({
   incompleteMessage,
   invalidMessage,
   validMessage,
+  showInvalidBorder = true,
+  reservedHintMessage,
   onChange,
 }: GenericPasswordInputProps) {
   const [isConcealed, setIsConcealed] = useState(true)
 
   return (
-    <div className="flex w-full flex-col gap-2 bg-white">
+    <div className="flex w-full flex-col bg-white">
       <div className="relative">
         <Input
           id={id}
@@ -41,7 +46,7 @@ export default function GenericPasswordInput({
           value={value}
           placeholder={placeholder}
           onChange={onChange}
-          hasError={state === InputState.Invalid}
+          hasError={showInvalidBorder && state === InputState.Invalid}
           className="pr-10"
         />
         <Button
@@ -60,11 +65,26 @@ export default function GenericPasswordInput({
           )}
         </Button>
       </div>
-      {getHint(state, {
-        incompleteMessage,
-        invalidMessage,
-        validMessage,
-      })}
+      {/* Stack reserved and visible hints so changing messages keeps the row height. */}
+      <div
+        className="grid min-h-10 py-2 [&>p]:col-start-1 [&>p]:row-start-1 [&>p]:m-0 [&>p]:self-center"
+        role="status"
+      >
+        {reservedHintMessage && (
+          <Hint
+            state={InputState.Invalid}
+            aria-hidden="true"
+            className="invisible"
+          >
+            {reservedHintMessage}
+          </Hint>
+        )}
+        {getHint(state, {
+          incompleteMessage,
+          invalidMessage,
+          validMessage,
+        })}
+      </div>
     </div>
   )
 }

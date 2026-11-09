@@ -68,26 +68,25 @@ export default function RecoverPasswordForm({
         ...ACTION_CODE_SETTING,
         url: `${window.location.origin}/login`,
       })
-
-      setHintState(HINT_STATE.SUCCESS)
-      setAvoidSpamCooldown(AVOID_SPAM_COOLDOWN)
-      const cooldownExpiredTime = Date.now() + AVOID_SPAM_COOLDOWN
-      setStorageItem(COOLDOWN_STORAGE_KEY, cooldownExpiredTime.toString())
     } catch (error) {
       if (
-        error instanceof FirebaseError &&
-        error.code === FirebaseAuthError.USER_NOT_FOUND
+        !(
+          error instanceof FirebaseError &&
+          error.code === FirebaseAuthError.USER_NOT_FOUND
+        )
       ) {
-        setHintState(HINT_STATE.NOT_REGISTERED)
-      } else {
         setHintState(HINT_STATE.ERROR)
+        const info = generateErrorReportInfo(normalizeError(error), {
+          userEmail: email,
+        })
+        sendErrorLog(info)
+        return
       }
-
-      const info = generateErrorReportInfo(normalizeError(error), {
-        userEmail: email,
-      })
-      sendErrorLog(info)
     }
+    setHintState(HINT_STATE.SUCCESS)
+    setAvoidSpamCooldown(AVOID_SPAM_COOLDOWN)
+    const cooldownExpiredTime = Date.now() + AVOID_SPAM_COOLDOWN
+    setStorageItem(COOLDOWN_STORAGE_KEY, cooldownExpiredTime.toString())
   }
 
   useEffect(() => {

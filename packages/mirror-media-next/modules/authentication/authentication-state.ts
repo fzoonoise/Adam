@@ -20,13 +20,10 @@ const AuthMethod = {
   Google: 'Google',
   Facebook: 'Facebook',
   Apple: 'Apple',
-  Email: 'email',
-  Default: '',
 } as const
 
 type LoginFormMode = (typeof FormMode)[keyof typeof FormMode]
 type LoginFormState = (typeof FormState)[keyof typeof FormState]
-type AuthMethodValue = (typeof AuthMethod)[keyof typeof AuthMethod]
 type ThirdPartyAuthMethod =
   | typeof AuthMethod.Google
   | typeof AuthMethod.Facebook
@@ -35,7 +32,6 @@ type ThirdPartyAuthMethod =
 type LoginState = {
   state: LoginFormState // 頁面狀態
   loginFormMode: LoginFormMode // 頁面狀態為 Form 時，對話框的狀態
-  prevAuthMethod: string // 先前登入所使用的方法
   shouldShowHintOfExistenceOfDifferentAuthMethod: boolean // 是否顯示已使用其他方式註冊的提示
   email: string // 輸入的 E-mail
   password: string // 輸入的密碼
@@ -45,7 +41,6 @@ type LoginState = {
 const initialState: LoginState = {
   state: FormState.Form,
   loginFormMode: FormMode.Start,
-  prevAuthMethod: AuthMethod.Default,
   shouldShowHintOfExistenceOfDifferentAuthMethod: false,
   email: '',
   password: '',
@@ -71,9 +66,6 @@ const loginSlice = createSlice({
     clearPassword: (state) => {
       state.password = ''
     },
-    changePrevAuthMethod: (state, action: PayloadAction<string>) => {
-      state.prevAuthMethod = action.payload
-    },
     changeShouldShowHintOfExistenceOfDifferentAuthMethod: (
       state,
       action: PayloadAction<boolean>
@@ -88,7 +80,6 @@ const loginSlice = createSlice({
     },
     resetLoginState: (state) => {
       state.state = FormState.Form
-      state.prevAuthMethod = AuthMethod.Default
       state.shouldShowHintOfExistenceOfDifferentAuthMethod = false
       state.email = ''
       state.password = ''
@@ -103,29 +94,15 @@ const loginSlice = createSlice({
     goToLoginForm: (state) => {
       state.state = FormState.Form
       state.loginFormMode = FormMode.Login
-      state.prevAuthMethod = AuthMethod.Email
     },
     goToRegistrationForm: (state) => {
       state.state = FormState.Form
       state.loginFormMode = FormMode.Registration
     },
-    setSignInWithGoogle: (state) => {
-      state.prevAuthMethod = AuthMethod.Google
-      state.shouldShowHintOfExistenceOfDifferentAuthMethod = true
-    },
-    setSignInWithFacebook: (state) => {
-      state.prevAuthMethod = AuthMethod.Facebook
-      state.shouldShowHintOfExistenceOfDifferentAuthMethod = true
-    },
-    setSignInWithApple: (state) => {
-      state.prevAuthMethod = AuthMethod.Apple
-      state.shouldShowHintOfExistenceOfDifferentAuthMethod = true
-    },
   },
 })
 
 const loginState = (state: AppState) => state.login.state
-const loginPrevAuthMethod = (state: AppState) => state.login.prevAuthMethod
 const loginShouldShowHintOfExistenceOfDifferentAuthMethod = (state: AppState) =>
   state.login.shouldShowHintOfExistenceOfDifferentAuthMethod
 const loginEmail = (state: AppState) => state.login.email
@@ -142,16 +119,10 @@ export {
   loginFormMode,
   loginIsFederatedRedirectResultLoading,
   loginPassword,
-  loginPrevAuthMethod,
   loginShouldShowHintOfExistenceOfDifferentAuthMethod,
   loginState,
 }
-export type {
-  AuthMethodValue,
-  LoginFormMode,
-  LoginFormState,
-  ThirdPartyAuthMethod,
-}
+export type { LoginFormMode, LoginFormState, ThirdPartyAuthMethod }
 export const loginActions = loginSlice.actions
 
 export default loginSlice.reducer

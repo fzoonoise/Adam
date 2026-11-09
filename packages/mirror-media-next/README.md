@@ -130,6 +130,7 @@ packages/mirror-media-next/
 │   │   ├── authentication-form.ts
 │   │   ├── authentication-utils.ts
 │   │   ├── authentication-redirect.ts  # Same-origin post-login destination
+│   │   ├── password-policy.ts          # Login and new-password validation and hints
 │   │   ├── use-authentication-redirect.ts
 │   │   └── components/                 # Login, password and email-action UI
 │   ├── commerce/

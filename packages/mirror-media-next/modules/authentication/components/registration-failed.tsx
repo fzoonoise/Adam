@@ -8,8 +8,11 @@ export default function RegistrationFailed() {
   const dispatch = useAppDispatch()
   return (
     <GenericFailed
-      primaryText="請回上一頁重試"
+      primaryText="無法完成註冊，請重試或改用其他登入方式。"
       onBack={() => dispatch(loginActions.goToRegistrationForm())}
+      onLogin={() => {
+        dispatch(loginActions.goToStart())
+      }}
     />
   )
 }

@@ -1,33 +1,36 @@
-import { type ChangeEventHandler, useState } from 'react'
+import type { ChangeEventHandler } from 'react'
 
 import { useAppDispatch, useAppSelector } from '@/hooks/useRedux'
-import { isValidEmail } from '@/utils'
+import { isCompanyEmail, isValidEmail } from '@/utils'
 
-import { InputState, type InputStateEnum } from '../authentication-form'
+import { InputState } from '../authentication-form'
 import { loginActions, loginEmail } from '../authentication-state'
 
 import GenericTextInput from './text-input'
 
-const getValidity = (email: string): InputStateEnum => {
-  if (email === '') return InputState.Start
-  return isValidEmail(email) ? InputState.Valid : InputState.Incomplete
-}
-
 export default function RegistrationEmailInput() {
   const dispatch = useAppDispatch()
   const email = useAppSelector(loginEmail)
-  const [state, setState] = useState<InputStateEnum>(getValidity(email))
+  const hasValidFormat = isValidEmail(email)
+  const shouldUseGoogle = hasValidFormat && isCompanyEmail(email)
+  const invalidMessage = shouldUseGoogle
+    ? '若您想使用本公司企業信箱，請切換至「登入」，選擇 Google 帳號登入，以享有 Premium 會員資格。'
+    : '請輸入有效的 Email 地址'
+  const state =
+    email === ''
+      ? InputState.Start
+      : hasValidFormat && !shouldUseGoogle
+        ? InputState.Valid
+        : InputState.Invalid
 
   const handleInputChange: ChangeEventHandler<HTMLInputElement> = (event) => {
-    const inputValue = event.target.value
-    setState(getValidity(inputValue))
-    dispatch(loginActions.setEmail(inputValue))
+    dispatch(loginActions.setEmail(event.target.value))
   }
 
   return (
     <GenericTextInput
       placeholder="name@example.com"
-      incompleteMessage="Email 格式正確"
+      invalidMessage={invalidMessage}
       validMessage="Email 格式正確"
       value={email}
       state={state}

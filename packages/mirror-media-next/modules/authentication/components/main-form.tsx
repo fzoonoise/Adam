@@ -1,36 +1,13 @@
 import Image from 'next/image'
 
-import FormWrapper from '@/components/common/form-wrapper'
 import { Typography } from '@/components/ui/typography'
-import { useAppSelector } from '@/hooks/useRedux'
 import DesktopBanner from '@/public/images-next/login/banner-desktop.png'
 import MobileBanner from '@/public/images-next/login/banner-mobile.png'
 import TabletBanner from '@/public/images-next/login/banner-tablet.png'
 
-import { FormMode, loginFormMode } from '../authentication-state'
-
-import MainFormLoginWithPassword from './main-form-login-with-password'
-import MainFormRegistration from './main-form-registration'
 import MainFormStart from './main-form-start'
 
 export default function MainForm() {
-  const formMode = useAppSelector(loginFormMode)
-
-  const getFormContentByMode = () => {
-    switch (formMode) {
-      case FormMode.Start:
-        return <MainFormStart />
-      case FormMode.Registration:
-        return <MainFormRegistration />
-      case FormMode.Login:
-        return <MainFormLoginWithPassword />
-      default: {
-        const unhandledMode: never = formMode
-        throw new Error(`Unexpected login form mode: ${String(unhandledMode)}`)
-      }
-    }
-  }
-
   return (
     <main className="flex flex-col items-center">
       <Image
@@ -64,7 +41,7 @@ export default function MainForm() {
           現在，請立即加入，成為我們的會員，體驗有質量、無干擾的新聞閱讀。
         </Typography>
       </section>
-      <FormWrapper className="2xl:my-15">{getFormContentByMode()}</FormWrapper>
+      <MainFormStart />
     </main>
   )
 }

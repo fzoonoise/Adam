@@ -1,9 +1,9 @@
-import { type ChangeEventHandler, useState } from 'react'
+import type { ChangeEventHandler } from 'react'
 
 import { useAppDispatch, useAppSelector } from '@/hooks/useRedux'
-import { isValidEmail } from '@/utils'
+import { isCompanyEmail, isValidEmail } from '@/utils'
 
-import { InputState, type InputStateEnum } from '../authentication-form'
+import { InputState } from '../authentication-form'
 import { loginActions, loginEmail } from '../authentication-state'
 
 import GenericTextInput from './text-input'
@@ -12,26 +12,31 @@ type EmailInputProps = {
   shouldShowHint?: boolean // 是否顯示輸入提示訊息
 }
 
-const getValidity = (email: string): InputStateEnum => {
-  if (email === '') return InputState.Start
-  return isValidEmail(email) ? InputState.Valid : InputState.Invalid
-}
-
 export default function EmailInput({ shouldShowHint = true }: EmailInputProps) {
   const dispatch = useAppDispatch()
   const email = useAppSelector(loginEmail)
-  const [state, setState] = useState<InputStateEnum>(getValidity(email))
+  const hasValidFormat = isValidEmail(email)
+  const shouldUseGoogle = hasValidFormat && isCompanyEmail(email)
+  const invalidMessage = shouldShowHint
+    ? shouldUseGoogle
+      ? '若您想以本公司企業信箱登入，請點擊上方「以 Google 帳號繼續」重試，以享有 Premium 會員資格。'
+      : '請輸入有效的 Email 地址'
+    : ''
+  const state =
+    email === ''
+      ? InputState.Start
+      : hasValidFormat && !shouldUseGoogle
+        ? InputState.Valid
+        : InputState.Invalid
 
   const handleInputChange: ChangeEventHandler<HTMLInputElement> = (event) => {
-    const inputValue = event.target.value
-    if (shouldShowHint) setState(getValidity(inputValue))
-    dispatch(loginActions.setEmail(inputValue))
+    dispatch(loginActions.setEmail(event.target.value))
   }
 
   return (
     <GenericTextInput
       placeholder="name@example.com"
-      invalidMessage={shouldShowHint ? '請輸入有效的 Email 地址' : ''}
+      invalidMessage={invalidMessage}
       validMessage={shouldShowHint ? 'Email 格式正確' : ''}
       value={email}
       state={state}
