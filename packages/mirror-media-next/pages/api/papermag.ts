@@ -16,6 +16,10 @@ import {
   SITE_URL,
 } from '../../config/index.mjs'
 import { PLAN_LIST } from '../../constants/papermag'
+import {
+  buildOrderBindingCookie,
+  getOrderBindingSecret,
+} from '../../utils/newebpay.mjs'
 
 type PapermagTradeInfoInput =
   FetchPaymentDataOfPapermagMutationVariables['data']
@@ -146,6 +150,14 @@ export default async function EncryptInfo(
     const encryptPostData =
       await newebpay.getEncryptedFormPostData(infoForNewebpay)
 
+    // 結果頁用這張 cookie 確認是同一個瀏覽器下的單，才顯示訂購人資料
+    res.setHeader(
+      'Set-Cookie',
+      buildOrderBindingCookie(
+        infoForNewebpay.MerchantOrderNo,
+        getOrderBindingSecret(NEWEBPAY_PAPERMAG_KEY, NEWEBPAY_PAPERMAG_IV)
+      )
+    )
     res.send({
       status: 'success',
       data: encryptPostData,
