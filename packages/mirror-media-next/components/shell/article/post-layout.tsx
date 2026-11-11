@@ -237,7 +237,7 @@ export default function PostLayout(props: PostLayoutProps) {
           publishedDate={publishedDate}
           updatedAt={updatedAt}
         />
-        <div className="sticky top-27 z-1 order-4 col-span-full flex items-start justify-around gap-x-3 bg-white p-2 md:static md:col-start-8 md:justify-end md:py-0">
+        <div className="sticky top-12 z-1 order-4 col-span-full flex items-start justify-around gap-x-3 bg-white p-2 md:static md:col-start-8 md:justify-end md:py-0">
           <IconLink
             href="https://google.com/preferences/source?q=mirrormedia.mg"
             className="GTM-click-preferred-source flex h-7 items-center rounded-full border px-1.5 py-1 md:gap-1 md:px-2.5"
