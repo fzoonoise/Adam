@@ -142,6 +142,16 @@ const Panel = styled.section`
     /** @param {ActiveProps} props */
     ({ $active }) => ($active ? 'visible' : 'hidden')
   };
+
+  ${({ theme }) => theme.breakpoint.md} {
+    align-self: stretch;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      min-height: 664px;
+    }
+  }
 `
 
 /**

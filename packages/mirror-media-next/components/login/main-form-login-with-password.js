@@ -79,6 +79,10 @@ const ControlGroup = styled.div`
   flex-direction: column;
   row-gap: 12px;
   margin-bottom: 16px;
+
+  ${({ theme }) => theme.breakpoint.md} {
+    margin-top: auto;
+  }
 `
 
 /**

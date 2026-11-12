@@ -8,7 +8,11 @@ import { InputState } from '../../constants/form'
 import { useReferrer } from '../../context/referrer'
 import { auth } from '../../firebase'
 import { useAppDispatch, useAppSelector } from '../../hooks/useRedux'
-import { isValidNewPassword } from '../../modules/authentication/password-policy'
+import PasswordConfirmationInput from '../../modules/authentication/password-confirmation-input'
+import {
+  getPasswordConfirmationInputState,
+  isValidNewPassword,
+} from '../../modules/authentication/password-policy'
 import {
   FormState,
   loginActions,
@@ -55,6 +59,10 @@ const ControlGroup = styled.div`
   flex-direction: column;
   row-gap: 12px;
   margin-bottom: 16px;
+
+  ${({ theme }) => theme.breakpoint.md} {
+    margin-top: auto;
+  }
 `
 
 /**
@@ -68,12 +76,15 @@ export default function MainFormRegistration({ onSubmittingChange } = {}) {
   const isSubmitting = useRef(false)
   const email = useAppSelector(loginEmail)
   const password = useAppSelector(loginPassword)
+  const [passwordConfirmation, setPasswordConfirmation] = useState('')
   const isFederatedRedirectResultLoading = useAppSelector(
     loginIsFederatedRedirectResultLoading
   )
   const allowToSubmit =
     isValidEmail(email) &&
     isValidNewPassword(password) &&
+    getPasswordConfirmationInputState(password, passwordConfirmation) ===
+      InputState.Valid &&
     !isCompanyEmail(email) &&
     !isFederatedRedirectResultLoading
 
@@ -134,6 +145,11 @@ export default function MainFormRegistration({ onSubmittingChange } = {}) {
       <InputGroup>
         <RegistartionEmailInput />
         <RegistrationPasswordInput />
+        <PasswordConfirmationInput
+          password={password}
+          value={passwordConfirmation}
+          onChange={(e) => setPasswordConfirmation(e.target.value)}
+        />
       </InputGroup>
       <ControlGroup>
         <PrimaryButton

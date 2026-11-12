@@ -121,7 +121,8 @@ packages/mirror-media-next/
 │   └── podcasts/index.tsx              # Podcast route composition
 ├── modules/                            # Business capabilities, shallow by default
 │   ├── authentication/
-│   │   └── password-policy.ts          # Login and new-password validation and hints
+│   │   ├── password-policy.ts          # Login, new-password and confirmation validation
+│   │   └── password-confirmation-input.tsx # Registration and password-update confirmation UI
 │   ├── homepage/
 │   │   ├── homepage-types.ts           # Homepage-owned view-model types
 │   │   ├── homepage-data.ts            # Server data aggregation

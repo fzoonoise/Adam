@@ -6,9 +6,11 @@ import styled from 'styled-components'
 import { InputState } from '../../constants/form'
 import { useReferrer } from '../../context/referrer'
 import { auth } from '../../firebase'
+import PasswordConfirmationInput from '../../modules/authentication/password-confirmation-input'
 import {
   getNewPasswordHint,
   getNewPasswordInputState,
+  getPasswordConfirmationInputState,
   isValidLoginPassword,
   isValidNewPassword,
 } from '../../modules/authentication/password-policy'
@@ -59,17 +61,12 @@ export default function MainForm() {
   const [newPassword, setNewPassword] = useState('')
   const newPasswordState = getNewPasswordInputState(newPassword)
 
-  const [newPasswordCheck, setNewPassworkCheck] = useState('')
-  const newPasswordCheckState =
-    newPasswordCheck === ''
-      ? InputState.Start
-      : newPassword === newPasswordCheck
-        ? InputState.Valid
-        : InputState.Invalid
+  const [newPasswordCheck, setNewPasswordCheck] = useState('')
   const allowToSubmit =
     isValidLoginPassword(oldPassword) &&
     isValidNewPassword(newPassword) &&
-    newPassword === newPasswordCheck
+    getPasswordConfirmationInputState(newPassword, newPasswordCheck) ===
+      InputState.Valid
 
   const handleOnClickButton = async () => {
     if (!allowToSubmit || isSubmitting.current) return
@@ -151,13 +148,11 @@ export default function MainForm() {
       </FieldGroup>
       <FieldGroup>
         <FieldLabel>請再次輸入新密碼</FieldLabel>
-        <GenericPasswordInput
+        <PasswordConfirmationInput
+          password={newPassword}
           placeholder="再次輸入新密碼"
-          invalidMessage="兩次密碼須相符"
-          validMessage="兩次密碼相符"
-          onChange={(e) => setNewPassworkCheck(e.target.value)}
+          onChange={(e) => setNewPasswordCheck(e.target.value)}
           value={newPasswordCheck}
-          state={newPasswordCheckState}
         />
       </FieldGroup>
       <PrimaryButton

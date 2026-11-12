@@ -9,7 +9,10 @@ export default function RegistrationFailed() {
   return (
     <GenericFailed
       primaryText="無法完成註冊，請重試或改用其他登入方式。"
-      onBack={() => dispatch(loginActions.goToRegistrationForm())}
+      onBack={() => {
+        dispatch(loginActions.clearPassword())
+        dispatch(loginActions.goToRegistrationForm())
+      }}
       onLogin={() => {
         dispatch(loginActions.goToStart())
       }}

@@ -37,3 +37,11 @@ export function getNewPasswordInputState(password: string): InputStateEnum {
   if (password === '') return InputState.Start
   return isValidNewPassword(password) ? InputState.Valid : InputState.Invalid
 }
+
+export function getPasswordConfirmationInputState(
+  password: string,
+  confirmation: string
+): InputStateEnum {
+  if (confirmation === '') return InputState.Start
+  return password === confirmation ? InputState.Valid : InputState.Invalid
+}
