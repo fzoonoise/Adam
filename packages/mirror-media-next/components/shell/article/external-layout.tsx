@@ -155,7 +155,7 @@ export function ExternalLayout(props: ExternalLayoutProps) {
           publishedDate={publishedDate}
           updatedAt={updatedAt}
         />
-        <div className="sticky top-27 z-1 order-4 col-span-full flex items-start justify-around gap-x-3 bg-white p-2 md:static md:col-start-8 md:justify-end md:py-0">
+        <div className="sticky top-12 z-1 order-4 col-span-full flex items-start justify-around gap-x-3 bg-white p-2 md:static md:col-start-8 md:justify-end md:py-0">
           <IconLink
             target="_blank"
             href="https://google.com/preferences/source?q=mirrormedia.mg"
