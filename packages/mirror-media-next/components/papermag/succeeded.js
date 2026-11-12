@@ -196,6 +196,16 @@ export default function Succeeded({ orderData }) {
     receiveAddress,
   } = orderData
 
+  // 結果頁只在確認是下單的瀏覽器時才帶訂購人資料，沒有就整區不顯示
+  const hasCustomerInfo = Boolean(
+    purchaseName ||
+    purchaseEmail ||
+    purchaseMobile ||
+    receiveName ||
+    receiveMobile ||
+    receiveAddress
+  )
+
   return (
     <>
       <Message>您已完成付款，以下為本次訂購資訊。</Message>
@@ -258,38 +268,42 @@ export default function Succeeded({ orderData }) {
         </ContentWrapper>
 
         {/* 顧客資訊 */}
-        <Title>顧客資訊</Title>
-        <CustomerTitle style={{ marginTop: '16px' }}>訂購人</CustomerTitle>
-        <CustomerItem style={{ marginTop: '12px' }}>
-          <p className="name">姓名</p>
-          <p className="value">{purchaseName}</p>
-        </CustomerItem>
-        <CustomerItem>
-          <p className="name">電子信箱</p>
-          <p className="value">{purchaseEmail}</p>
-        </CustomerItem>
-        <CustomerItem>
-          <p className="name">聯絡電話</p>
-          <p className="value">{purchaseMobile}</p>
-        </CustomerItem>
+        {hasCustomerInfo && (
+          <>
+            <Title>顧客資訊</Title>
+            <CustomerTitle style={{ marginTop: '16px' }}>訂購人</CustomerTitle>
+            <CustomerItem style={{ marginTop: '12px' }}>
+              <p className="name">姓名</p>
+              <p className="value">{purchaseName}</p>
+            </CustomerItem>
+            <CustomerItem>
+              <p className="name">電子信箱</p>
+              <p className="value">{purchaseEmail}</p>
+            </CustomerItem>
+            <CustomerItem>
+              <p className="name">聯絡電話</p>
+              <p className="value">{purchaseMobile}</p>
+            </CustomerItem>
 
-        <CustomerTitle>收件人</CustomerTitle>
-        <CustomerItem style={{ marginTop: '12px' }}>
-          <p className="name">姓名</p>
-          <p className="value">{receiveName}</p>
-        </CustomerItem>
-        <CustomerItem>
-          <p className="name">聯絡電話</p>
-          <p className="value">{receiveMobile}</p>
-        </CustomerItem>
-        <CustomerItem>
-          <p className="name">通訊地址</p>
-          <p className="value">{receiveAddress}</p>
-        </CustomerItem>
-        <CustomerItem>
-          <p className="name">派送備註</p>
-          <p className="value">無</p>
-        </CustomerItem>
+            <CustomerTitle>收件人</CustomerTitle>
+            <CustomerItem style={{ marginTop: '12px' }}>
+              <p className="name">姓名</p>
+              <p className="value">{receiveName}</p>
+            </CustomerItem>
+            <CustomerItem>
+              <p className="name">聯絡電話</p>
+              <p className="value">{receiveMobile}</p>
+            </CustomerItem>
+            <CustomerItem>
+              <p className="name">通訊地址</p>
+              <p className="value">{receiveAddress}</p>
+            </CustomerItem>
+            <CustomerItem>
+              <p className="name">派送備註</p>
+              <p className="value">無</p>
+            </CustomerItem>
+          </>
+        )}
       </GrayBox>
 
       {/* 注意事項 */}

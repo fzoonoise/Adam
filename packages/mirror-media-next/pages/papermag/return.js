@@ -19,6 +19,12 @@ import { fetchHeaderDataInDefaultPageLayout } from '../../utils/api'
 import { setPageCache } from '../../utils/cache-setting'
 import { getSectionAndTopicFromDefaultHeaderData } from '../../utils/data-process'
 import { getLogTraceObject, transformTimeData } from '../../utils/index'
+import {
+  getOrderBindingSecret,
+  isOrderBoundToRequest,
+  parseNewebpayCallback,
+  verifyTradeSha,
+} from '../../utils/newebpay.mjs'
 import { getMerchandiseAndShippingFeeInfo } from '../../utils/papermag'
 import { processSettledResult } from '../../utils/response-processor'
 
@@ -233,20 +239,59 @@ export async function getServerSideProps({ query, req, res }) {
   try {
     // 資料來源：https://github.com/vercel/next.js/discussions/14979
     const infoData = await parseRequestBody(req)
-    if (infoData.Status !== 'SUCCESS') {
+    const warn = (message) =>
+      console.warn(
+        JSON.stringify({ severity: 'WARNING', message, ...globalLogFields })
+      )
+
+    // 先驗 TradeSha，沒簽過的 TradeInfo 一律不解、不查單
+    if (
+      !verifyTradeSha(
+        infoData.TradeInfo,
+        infoData.TradeSha,
+        NEWEBPAY_PAPERMAG_KEY,
+        NEWEBPAY_PAPERMAG_IV
+      )
+    ) {
+      warn('papermag return rejected: TradeSha mismatch')
       return {
         props: { sectionsData, topicsData, orderStatus, orderData },
       }
     }
 
     const newebpay = new NewebPay(NEWEBPAY_PAPERMAG_KEY, NEWEBPAY_PAPERMAG_IV)
-    const decryptedTradeInfo = await newebpay.getDecryptedTradeInfo(
-      infoData.TradeInfo
+    const callback = parseNewebpayCallback(
+      await newebpay.getDecryptedTradeInfo(infoData.TradeInfo)
     )
+    if (!callback) {
+      warn('papermag return rejected: TradeInfo is not a NewebPay result')
+      return {
+        props: { sectionsData, topicsData, orderStatus, orderData },
+      }
+    }
+    // Status 以簽過的 TradeInfo 為準，不信表單欄位
+    if (callback.status !== 'SUCCESS') {
+      return {
+        props: { sectionsData, topicsData, orderStatus, orderData },
+      }
+    }
 
-    const MerchantOrderNo =
-      decryptedTradeInfo.Result?.MerchantOrderNo ||
-      JSON.parse(Object.keys(decryptedTradeInfo)[0]).Result.MerchantOrderNo
+    const MerchantOrderNo = callback.merchantOrderNo
+
+    /*
+     * TradeSha 只能證明這筆 TradeInfo 是藍新簽的，擋不了拿別人的結果頁 POST 重放。
+     * 訂購人／收件人資料只給下單時拿到綁定 cookie 的那個瀏覽器看。
+     */
+    const isOrderBound = isOrderBoundToRequest(
+      req.headers.cookie,
+      MerchantOrderNo,
+      getOrderBindingSecret(NEWEBPAY_PAPERMAG_KEY, NEWEBPAY_PAPERMAG_IV)
+    )
+    if (!isOrderBound) {
+      warn(
+        `papermag return: order ${MerchantOrderNo} not bound to this browser, customer info hidden`
+      )
+    }
 
     const result = await client.query({
       query: fetchAllMemberByOrderNo,
@@ -291,14 +336,18 @@ export async function getServerSideProps({ query, req, res }) {
       date: transformTimeData(magazineOrderData.createdAt, 'dash'),
       discountCode: magazineOrderData.promoteCode,
       orderInfoPurchasedList,
-      purchaseName: magazineOrderData.purchaseName,
-      purchaseEmail: magazineOrderData.purchaseEmail,
-      purchaseMobile: magazineOrderData.purchaseMobile,
-      receiveName: magazineOrderData.receiveName,
-      receiveMobile: magazineOrderData.receiveMobile,
-      receiveAddress: magazineOrderData.receiveAddress,
+      ...(isOrderBound
+        ? {
+            purchaseName: magazineOrderData.purchaseName,
+            purchaseEmail: magazineOrderData.purchaseEmail,
+            purchaseMobile: magazineOrderData.purchaseMobile,
+            receiveName: magazineOrderData.receiveName,
+            receiveMobile: magazineOrderData.receiveMobile,
+            receiveAddress: magazineOrderData.receiveAddress,
+          }
+        : {}),
     }
-    orderStatus = infoData.Status
+    orderStatus = callback.status
   } catch (err) {
     const annotatingAxiosError = errors.helpers.annotateAxiosError(err)
     console.error(
